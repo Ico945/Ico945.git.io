@@ -96,18 +96,18 @@
 
 
 
-<meta name="description" content="&amp;lt;未完待续&amp;gt; 主要记录Spring容器中的Bean如何实现Aware接口来对事件进行发布管理；Spring容器通过一个基于线程池的任务执行器来进行异步任务的并发；&amp;lt;未完待续&amp;gt;">
+<meta name="description" content="主要记录Spring容器中的Bean如何实现Aware接口来对事件进行发布管理；Spring容器通过一个基于线程池的任务执行器来进行异步任务的并发；&amp;lt;未完待续&amp;gt;">
 <meta name="keywords" content="Springboot,SpringAware,多线程">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Spring高级话题">
 <meta property="og:url" content="http://yehengchao.cn/2018/06/30/Spring高级话题/index.html">
 <meta property="og:site_name" content="南寒">
-<meta property="og:description" content="&amp;lt;未完待续&amp;gt; 主要记录Spring容器中的Bean如何实现Aware接口来对事件进行发布管理；Spring容器通过一个基于线程池的任务执行器来进行异步任务的并发；&amp;lt;未完待续&amp;gt;">
+<meta property="og:description" content="主要记录Spring容器中的Bean如何实现Aware接口来对事件进行发布管理；Spring容器通过一个基于线程池的任务执行器来进行异步任务的并发；&amp;lt;未完待续&amp;gt;">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-06-30T14:33:12.097Z">
+<meta property="og:updated_time" content="2018-06-30T14:34:56.957Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Spring高级话题">
-<meta name="twitter:description" content="&amp;lt;未完待续&amp;gt; 主要记录Spring容器中的Bean如何实现Aware接口来对事件进行发布管理；Spring容器通过一个基于线程池的任务执行器来进行异步任务的并发；&amp;lt;未完待续&amp;gt;">
+<meta name="twitter:description" content="主要记录Spring容器中的Bean如何实现Aware接口来对事件进行发布管理；Spring容器通过一个基于线程池的任务执行器来进行异步任务的并发；&amp;lt;未完待续&amp;gt;">
 
 
 
@@ -402,7 +402,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  1,419
+                  1,415
                 </span>
               
 
@@ -439,8 +439,7 @@
       
 
       
-        <p>&lt;未完待续&gt;</p>
-<p>主要记录Spring容器中的Bean如何实现Aware接口来对事件进行发布管理；Spring容器通过一个基于线程池的任务执行器来进行异步任务的并发；&lt;未完待续&gt;</p>
+        <p>主要记录Spring容器中的Bean如何实现Aware接口来对事件进行发布管理；Spring容器通过一个基于线程池的任务执行器来进行异步任务的并发；&lt;未完待续&gt;</p>
 <a id="more"></a>
 <h4 id="Spring-Aware"><a href="#Spring-Aware" class="headerlink" title="Spring Aware"></a>Spring Aware</h4><p>​    Spring的依赖注入最大亮点就是所有的Bean 对Spring 容器的存在是没有意识的。即可以将现在的容器换成别的容器，比如 Goole Guice，这时Bean之间的耦合度很低。</p>
 <p>​    但是实际项目中不可避免的用到Spring 容器本身的功能资源，这时Bean必须意识到Spring 容器的存在，才能调用Spring所提供的资源，这就是Spring Aware。使用了Spring Aware 的话Bean将会和Spring 架构之间耦合。</p>
