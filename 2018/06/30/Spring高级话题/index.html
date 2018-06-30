@@ -81,7 +81,7 @@
 
 
 
-  <meta name="keywords" content="ico,yhc" />
+  <meta name="keywords" content="Springboot,SpringAware,多线程," />
 
 
 
@@ -92,17 +92,18 @@
 
 
 
-<meta name="description" content="世界很大，我们一起去看看。">
+<meta name="description" content="&amp;lt;未完待续&amp;gt;">
+<meta name="keywords" content="Springboot,SpringAware,多线程">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Spring 高级话题">
+<meta property="og:title" content="Spring高级话题">
 <meta property="og:url" content="http://yehengchao.cn/2018/06/30/Spring高级话题/index.html">
 <meta property="og:site_name" content="南寒的博客">
-<meta property="og:description" content="世界很大，我们一起去看看。">
+<meta property="og:description" content="&amp;lt;未完待续&amp;gt;">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-06-30T02:16:29.263Z">
+<meta property="og:updated_time" content="2018-06-30T06:18:25.518Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Spring 高级话题">
-<meta name="twitter:description" content="世界很大，我们一起去看看。">
+<meta name="twitter:title" content="Spring高级话题">
+<meta name="twitter:description" content="&amp;lt;未完待续&amp;gt;">
 
 
 
@@ -138,7 +139,7 @@
 
 
 
-  <title>Spring 高级话题 | 南寒的博客</title>
+  <title>Spring高级话题 | 南寒的博客</title>
   
 
 
@@ -326,7 +327,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Spring 高级话题</h1>
+          <h1 class="post-title" itemprop="name headline">Spring高级话题</h1>
         
 
         <div class="post-meta">
@@ -348,6 +349,28 @@
             
           </span>
 
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Springboot/" itemprop="url" rel="index">
+                    <span itemprop="name">Springboot</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -375,7 +398,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  0
+                  664
                 </span>
               
 
@@ -391,7 +414,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  1
+                  3
                 </span>
               
             </div>
@@ -412,7 +435,53 @@
       
 
       
-        
+        <p>&lt;未完待续&gt;</p>
+<a id="more"></a>
+<h4 id="Spring-Aware"><a href="#Spring-Aware" class="headerlink" title="Spring Aware"></a>Spring Aware</h4><p>​    Spring的依赖注入最大亮点就是所有的Bean 对Spring 容器的存在是没有意识的。即可以将现在的容器换成别的容器，比如 Goole Guice，这时Bean之间的耦合度很低。</p>
+<p>​    但是实际项目中不可避免的用到Spring 容器本身的功能资源，这时Bean必须意识到Spring 容器的存在，才能调用Spring所提供的资源，这就是Spring Aware。使用了Spring Aware 的话Bean将会和Spring 架构之间耦合。</p>
+<p>Spring 提供的Aware接口如图所示：</p>
+<table>
+<thead>
+<tr>
+<th>接口</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BeanNameAware</td>
+<td>获得容器中Bean的名称</td>
+</tr>
+<tr>
+<td>BeanFactoryAware</td>
+<td>获得当前 bean factory，这样可以调用容器服务。</td>
+</tr>
+<tr>
+<td>ApplicationContextAware*</td>
+<td>当前 application context，这样可以调用容器服务。</td>
+</tr>
+<tr>
+<td>MessageSourceAware</td>
+<td>获得message source，这样可以获得文本信息。</td>
+</tr>
+<tr>
+<td>ApplicationEventPublisherAware</td>
+<td>应用事件发布器，可以发布事件。</td>
+</tr>
+<tr>
+<td>ResourceLoaderAware</td>
+<td>获得资源加载器，可以获得外部资源文件</td>
+</tr>
+</tbody>
+</table>
+<p>​    Spring Aware 的目的是为了让Bean获得Spring 容器的服务。因为ApplicationContext接口集成了MessageSource接口、ApplicationEventPublisher接口和ResourceLoader接口，所以Bean 只要继承ApplicationContext就可以获得Spring容器的所有服务，但原则上还是用到什么接口就实现什么接口。</p>
+<p>示例，Spring Aware演示的Bean</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> aware;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.commons.io.IOUtils;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.BeanNameAware;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.ResourceLoaderAware;</span><br><span class="line"><span class="keyword">import</span> org.springframework.core.io.Resource;</span><br><span class="line"><span class="keyword">import</span> org.springframework.core.io.ResourceLoader;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AwareService</span> <span class="keyword">implements</span> <span class="title">BeanNameAware</span>, <span class="title">ResourceLoaderAware</span> </span>&#123;   <span class="comment">//实现BeanNameAware和ResourceLoaderAware两个接口，获得Bean名称和资源加载的服务。</span></span><br><span class="line">    <span class="keyword">private</span> String beanName;</span><br><span class="line">    <span class="keyword">private</span> ResourceLoader loader;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span>   <span class="comment">//这里还有下面的注解刚开始出了点小问题，实现接口方法用@Override出现 "@Override is not allowed when implementing interface method" ,[解决办法及原因](https://stackoverflow.com/questions/15402615/override-is-not-allowed-when-implementing-interface-method)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setResourceLoader</span><span class="params">(ResourceLoader resourceLoader)</span></span>&#123;    <span class="comment">//重写setResource方法。</span></span><br><span class="line">        <span class="keyword">this</span>.loader = resourceLoader;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setBeanName</span><span class="params">(String name)</span></span>&#123;   <span class="comment">//重写setBeanName方法。</span></span><br><span class="line">        <span class="keyword">this</span>.beanName = name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">outputResult</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Bean的名称为："</span> + beanName);</span><br><span class="line">        Resource resource = loader.getResource(<span class="string">"classpath:aware/test.txt"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">"ResourceLoader加载的文件内容为："</span> + IOUtils.toString(resource.getInputStream()));</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e)&#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>配置类：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> aware;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.ComponentScan;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Configuration;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@ComponentScan</span>(<span class="string">"aware"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AwareConfig</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> aware;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.AnnotationConfigApplicationContext;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        AnnotationConfigApplicationContext context = <span class="keyword">new</span> AnnotationConfigApplicationContext(AwareConfig.class);</span><br><span class="line"></span><br><span class="line">        AwareService awareService = context.getBean(AwareService.class);</span><br><span class="line"></span><br><span class="line">        awareService.outputResult();	</span><br><span class="line"></span><br><span class="line">        context.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">运行结果：</span><br><span class="line">Bean的名称为：awareService</span><br><span class="line">ResourceLoader加载的文件内容为：<span class="keyword">this</span> is a test file</span><br></pre></td></tr></table></figure>
+<h4 id="多线程"><a href="#多线程" class="headerlink" title="多线程"></a>多线程</h4>
       
     </div>
     
@@ -426,6 +495,16 @@
     
 
     <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Springboot/" rel="tag"># Springboot</a>
+          
+            <a href="/tags/SpringAware/" rel="tag"># SpringAware</a>
+          
+            <a href="/tags/多线程/" rel="tag"># 多线程</a>
+          
+        </div>
       
 
       
@@ -496,8 +575,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -538,7 +626,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -591,6 +679,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#Spring-Aware"><span class="nav-number">1.</span> <span class="nav-text">Spring Aware</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#多线程"><span class="nav-number">2.</span> <span class="nav-text">多线程</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       

@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title><![CDATA[Spring 高级话题]]></title>
+    <title><![CDATA[Spring高级话题]]></title>
     <url>%2F2018%2F06%2F30%2FSpring%E9%AB%98%E7%BA%A7%E8%AF%9D%E9%A2%98%2F</url>
-    <content type="text"></content>
+    <content type="text"><![CDATA[&lt;未完待续&gt; Spring Aware​ Spring的依赖注入最大亮点就是所有的Bean 对Spring 容器的存在是没有意识的。即可以将现在的容器换成别的容器，比如 Goole Guice，这时Bean之间的耦合度很低。 ​ 但是实际项目中不可避免的用到Spring 容器本身的功能资源，这时Bean必须意识到Spring 容器的存在，才能调用Spring所提供的资源，这就是Spring Aware。使用了Spring Aware 的话Bean将会和Spring 架构之间耦合。 Spring 提供的Aware接口如图所示： 接口 功能 BeanNameAware 获得容器中Bean的名称 BeanFactoryAware 获得当前 bean factory，这样可以调用容器服务。 ApplicationContextAware* 当前 application context，这样可以调用容器服务。 MessageSourceAware 获得message source，这样可以获得文本信息。 ApplicationEventPublisherAware 应用事件发布器，可以发布事件。 ResourceLoaderAware 获得资源加载器，可以获得外部资源文件 ​ Spring Aware 的目的是为了让Bean获得Spring 容器的服务。因为ApplicationContext接口集成了MessageSource接口、ApplicationEventPublisher接口和ResourceLoader接口，所以Bean 只要继承ApplicationContext就可以获得Spring容器的所有服务，但原则上还是用到什么接口就实现什么接口。 示例，Spring Aware演示的Bean 12345678910111213141516171819202122232425262728293031323334353637package aware;import org.apache.commons.io.IOUtils;import org.springframework.beans.factory.BeanNameAware;import org.springframework.context.ResourceLoaderAware;import org.springframework.core.io.Resource;import org.springframework.core.io.ResourceLoader;import org.springframework.stereotype.Service;import java.io.IOException;@Servicepublic class AwareService implements BeanNameAware, ResourceLoaderAware &#123; //实现BeanNameAware和ResourceLoaderAware两个接口，获得Bean名称和资源加载的服务。 private String beanName; private ResourceLoader loader; @Override //这里还有下面的注解刚开始出了点小问题，实现接口方法用@Override出现 "@Override is not allowed when implementing interface method" ,[解决办法及原因](https://stackoverflow.com/questions/15402615/override-is-not-allowed-when-implementing-interface-method) public void setResourceLoader(ResourceLoader resourceLoader)&#123; //重写setResource方法。 this.loader = resourceLoader; &#125; @Override public void setBeanName(String name)&#123; //重写setBeanName方法。 this.beanName = name; &#125; public void outputResult()&#123; System.out.println("Bean的名称为：" + beanName); Resource resource = loader.getResource("classpath:aware/test.txt"); try &#123; System.out.println("ResourceLoader加载的文件内容为：" + IOUtils.toString(resource.getInputStream())); &#125; catch (IOException e)&#123; e.printStackTrace(); &#125; &#125;&#125; 配置类： 123456789package aware;import org.springframework.context.annotation.ComponentScan;import org.springframework.context.annotation.Configuration;@Configuration@ComponentScan("aware")public class AwareConfig &#123;&#125; 运行： 12345678910111213141516171819package aware;import org.springframework.context.annotation.AnnotationConfigApplicationContext;public class Main &#123; public static void main(String[] args) &#123; AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AwareConfig.class); AwareService awareService = context.getBean(AwareService.class); awareService.outputResult(); context.close(); &#125;&#125;运行结果：Bean的名称为：awareServiceResourceLoader加载的文件内容为：this is a test file 多线程]]></content>
+      <categories>
+        <category>Springboot</category>
+      </categories>
+      <tags>
+        <tag>Springboot</tag>
+        <tag>SpringAware</tag>
+        <tag>多线程</tag>
+      </tags>
   </entry>
   <entry>
     <title><![CDATA[Spring常用配置]]></title>
