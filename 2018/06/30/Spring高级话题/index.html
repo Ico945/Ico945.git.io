@@ -104,13 +104,13 @@
 <meta property="og:site_name" content="南寒">
 <meta property="og:description" content="主要记录Spring容器中的Bean如何实现Aware接口来对事件进行发布管理，Spring容器通过一个基于线程池的任务执行器来进行异步任务的并发，条件注解的使用，组合注解声明，Enable*注解的原理以及如何进行测试。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://yehengchao.cn/2018/06/30/Spring高级话题/img/3.7_1.png">
-<meta property="og:image" content="http://yehengchao.cn/2018/06/30/Spring高级话题/img/3.7_2.png">
-<meta property="og:updated_time" content="2018-07-01T14:31:57.744Z">
+<meta property="og:image" content="http://yehengchao.cn/2018/06/30/Spring高级话题/3.7_1.png">
+<meta property="og:image" content="http://yehengchao.cn/2018/06/30/Spring高级话题/3.7_2.png">
+<meta property="og:updated_time" content="2018-07-01T14:41:18.825Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Spring高级话题">
 <meta name="twitter:description" content="主要记录Spring容器中的Bean如何实现Aware接口来对事件进行发布管理，Spring容器通过一个基于线程池的任务执行器来进行异步任务的并发，条件注解的使用，组合注解声明，Enable*注解的原理以及如何进行测试。">
-<meta name="twitter:image" content="http://yehengchao.cn/2018/06/30/Spring高级话题/img/3.7_1.png">
+<meta name="twitter:image" content="http://yehengchao.cn/2018/06/30/Spring高级话题/3.7_1.png">
 
 
 
@@ -541,9 +541,9 @@
 <p>测试类，在src/test/java目录下：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> fortest;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.junit.Assert;</span><br><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"><span class="keyword">import</span> org.junit.runner.RunWith;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line"><span class="keyword">import</span> org.springframework.test.context.ActiveProfiles;</span><br><span class="line"><span class="keyword">import</span> org.springframework.test.context.ContextConfiguration;</span><br><span class="line"><span class="keyword">import</span> org.springframework.test.context.junit4.SpringJUnit4ClassRunner;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RunWith</span>(SpringJUnit4ClassRunner.class) <span class="comment">//SpringJUnit4ClassRunner在JUnit环境下提供Spring TestContext Framework的功能。</span></span><br><span class="line"><span class="meta">@ContextConfiguration</span>(classes = &#123;TestConfig.class&#125;) <span class="comment">//加载配置</span></span><br><span class="line"><span class="meta">@ActiveProfiles</span>(<span class="string">"prod"</span>) <span class="comment">//声明活动的profile</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DemoBeanIntegrationTests</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Autowired</span>  <span class="comment">//使用@Autowired注解注入Bean。</span></span><br><span class="line">    <span class="keyword">private</span> TestBean testBean;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span>   <span class="comment">//测试代码，使用JUnit的Assert来校验结果是否和预期一样</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">proBeanShouldInject</span><span class="params">()</span></span>&#123;</span><br><span class="line">        String expected = <span class="string">"from production profile"</span>;</span><br><span class="line">        String actual = testBean.getContent();</span><br><span class="line">        Assert.assertEquals(expected, actual);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>测试效果如下图所示：</p>
-<p><img src="./img/3.7_1.png" alt="Alt text"></p>
+<p><img src="3.7_1.png" alt="Alt text"></p>
 <p>接下来将@ActiveProfiles(“prod”)改为@ActiveProfiles(“dev”)，效果如下所示：</p>
-<p><img src="./img/3.7_2.png" alt="Alt text"></p>
+<p><img src="3.7_2.png" alt="Alt text"></p>
 
       
     </div>
