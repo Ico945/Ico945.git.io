@@ -104,7 +104,7 @@
 <meta property="og:site_name" content="南寒">
 <meta property="og:description" content="关于Java虚拟机GC垃圾收集机制，主要介绍了不同区域所使用的垃圾收集算法，以及他们的结合种类、适用场景。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-06-26T04:38:17.766Z">
+<meta property="og:updated_time" content="2018-07-02T01:08:33.763Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="垃圾收集和内存分配">
 <meta name="twitter:description" content="关于Java虚拟机GC垃圾收集机制，主要介绍了不同区域所使用的垃圾收集算法，以及他们的结合种类、适用场景。">
@@ -439,7 +439,9 @@
       
 
       
-        <p>关于Java虚拟机GC垃圾收集机制，主要介绍了不同区域所使用的垃圾收集算法，以及他们的结合种类、适用场景。</p>
+        <blockquote>
+<p>关于Java虚拟机GC垃圾收集机制，主要介绍了不同区域所使用的垃圾收集算法，以及他们的结合种类、适用场景。</p>
+</blockquote>
 <a id="more"></a>
 <h4 id="3-4-HotSpot算法实现"><a href="#3-4-HotSpot算法实现" class="headerlink" title="3.4 HotSpot算法实现"></a>3.4 HotSpot算法实现</h4><h5 id="3-4-2-安全点"><a href="#3-4-2-安全点" class="headerlink" title="3.4.2  安全点"></a>3.4.2  安全点</h5><p>​    JVM通过GC Roots节点来判断某个对象是否可达，但是如果需要逐个检查的话必然会消耗很多时间，所以需要使用一个名为OopMap的数据结构来记录引用位置的信息（如指令流的起始位置，偏移量等）。</p>
 <p>​    在OopMap的帮助下，JVM可以很快的完成GC Roots的枚举，但是这里会出现一个问题：并不是所有的指令都会生成对应的OopMap数据结构，假设如此需要大量的额外空间，导致GC的空间成本将会变得非常高。这里的解决办法是只在“特定位置”记录这些信息，这样的位置称之为安全点（safe point），当线程执行到safe point的时候才会停顿下来开始GC。这里的safe point选定不能太少也不能太多，太少GC等太久，太多增大运行负荷；这里的设置特征为“是否让程序长时间执行的特征”，最明显的特征就是指令序列的复用比如方法调用、循环跳转、异常跳转等位置。</p>

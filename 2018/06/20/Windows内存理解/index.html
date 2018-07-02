@@ -104,7 +104,7 @@
 <meta property="og:site_name" content="南寒">
 <meta property="og:description" content="Windows中内存是如何分配的。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-06-26T04:48:14.998Z">
+<meta property="og:updated_time" content="2018-07-02T01:08:17.923Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Windows内存">
 <meta name="twitter:description" content="Windows中内存是如何分配的。">
@@ -439,7 +439,9 @@
       
 
       
-        <p>Windows中内存是如何分配的。</p>
+        <blockquote>
+<p>Windows中内存是如何分配的。</p>
+</blockquote>
 <a id="more"></a>
 <p><strong>分配的是虚拟地址空间，不是虚拟空间；</strong><br>为什么分配这么大？这是windows给出的承诺，向应用程序承诺，在物理内存足够大的情况下，我能够提供给你这么大的地址空间（注意这里的用词是地址空间，意思是有允许其内存寻址最多到8T这个数字）<br>当然，虚拟内存空间地址是一回事，实际空间是另一回事。<br>之前说了，虚拟空间地址只是承诺<strong>能够寻址</strong>，并非真的分配了空间；当应用程序真的申请了地址空间内能访问的内存时，windows才会开始把被访问的<strong>内存页</strong>映射到物理内存中。（没错，人家就是打了个空头支票，实际情况是你用一页我分配一页）<br>所以总结如下：<br><strong>所谓的8T（0x200000000）有什么用：</strong>允许应用程序访问0x0-0x200000000的任意地址，当然访问0x200000001就会报错，因为超出地址空间了（所以虚拟地址空间越大越好，这样编译器布局内存自由度更大）<br><strong>64位系统为例，物理内存16G，应用程序用了10G，会发生什么：</strong>也就是说我允许应用程序用8T内存，但他只用了10G，那没问题，因为可以映射到16G物理内存中；<br><strong>64位系统为例，物理内存16G，应用程序用了17G，会发生什么：</strong>唔，物理内存有点不够用，但是可以把一些内存页存到硬盘上（虚拟内存），所以问题也不大，但是进程切换可能引起内存页在硬盘上的读写，所以电脑会有点卡<br><strong>64位系统为例，物理内存16G，应用程序申请了8T，会发生什么：</strong>没错，应用程序的确被允许使用8T内存，但是此时系统提供不了这么多，空头支票暴露，你的系统奔溃了</p>
 

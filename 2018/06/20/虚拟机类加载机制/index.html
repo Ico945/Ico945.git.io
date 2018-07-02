@@ -106,7 +106,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="c:/Users/yehen/AppData/Local/Temp/1526473361124.png">
 <meta property="og:image" content="c:/Users/yehen/AppData/Local/Temp/1526474197627.png">
-<meta property="og:updated_time" content="2018-06-26T04:33:36.223Z">
+<meta property="og:updated_time" content="2018-07-02T01:08:49.603Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="虚拟机类加载机制">
 <meta name="twitter:description" content="记录下Java中类加载的时机，类在加载过程经历的阶段。&amp;lt;未完待续&amp;gt;">
@@ -442,7 +442,9 @@
       
 
       
-        <p>记录下Java中类加载的时机，类在加载过程经历的阶段。&lt;未完待续&gt;</p>
+        <blockquote>
+<p>记录下Java中类加载的时机，类在加载过程经历的阶段。&lt;未完待续&gt;</p>
+</blockquote>
 <a id="more"></a>
 <h4 id="7-2-类加载的时机"><a href="#7-2-类加载的时机" class="headerlink" title="7.2 类加载的时机"></a>7.2 类加载的时机</h4><pre><code>类从被加载到虚拟机内存开始，到卸载出内存，其整个生命周期包括：加载、验证、准备、解析、初始化、使用和卸载7个阶段。其中验证、准备、解析部分统称为连接。
 </code></pre><p>​    加载、验证、准备、初始化和卸载这5个阶段的顺序是确定的，什么时候开始加载并没有进行强制约束，可以交给虚拟机的具体实现来自由把握。</p>
