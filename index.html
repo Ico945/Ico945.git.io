@@ -313,6 +313,229 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yehengchao.cn/2018/07/03/SpringMVC基础/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ico">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/Avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="南寒">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/03/SpringMVC基础/" itemprop="url">SpringMVC基础</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-03T10:32:53+08:00">
+                2018-07-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Springboot/" itemprop="url" rel="index">
+                    <span itemprop="name">Springboot</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,384
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  6
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <a id="more"></a>
+<h4 id="SpringMVC概述"><a href="#SpringMVC概述" class="headerlink" title="SpringMVC概述"></a>SpringMVC概述</h4><p>​    首先说说什么是MVC，它和三层架构的关系：</p>
+<ul>
+<li>MVC：Model + View  + Controller (数据模型+视图+控制器)。</li>
+<li>三层架构：Presentation tier + Application tier + Data tier (展现层+应用层+数据访问层)。</li>
+</ul>
+<p>​       实际上MVC只存在三层架构的展现层，M是数据模型，是包含数据的对象 。在SpringMVC里有一个专门的类叫Model，用来和V之间进行数据交互、传值；V指的是视图页面，包含JSP、freeMarker、Velocity、Thymeleaf、Tile等；C是控制器(SpringMVC的注解@Controller的类)。</p>
+<p>​    而三层架构是整个应用的架构，是由Spring框架负责管理的。一般项目结构中都有Service层、DAO层，这两个反馈在应用层和数据访问层。</p>
+<h4 id="SpringMVC的常用注解"><a href="#SpringMVC的常用注解" class="headerlink" title="SpringMVC的常用注解"></a>SpringMVC的常用注解</h4><p>SpringMVC常用以下几个注解：</p>
+<ul>
+<li><p>@Controller</p>
+<p>​    该注解在类上，表明这个类是Spring MVC里的Controller，将其声明为Spring的一个Bean，Dispatcher Servlet会自动扫描注解了此注解的类，将Web请求映射到注解了@RequestMapping的方法上。在声明普通Bean的时候，使用@Component、@Service、@Repository和@Controller是等同的，因为后面三个都组合了@Component元注解；但在Spring MVC声明控制器Bean的时候只能使用@Controller。</p>
+</li>
+<li><p>@RequestMapping</p>
+<p>​    该注解是用来映射Web请求(访问路径和参数)、处理类和方法的。@RequestMapping可注解在类和方法上。注解在方法上的@RequestMapping路径会继承注解在类上的路径，@RequestMapping支持Servlet的request和response作为参数，也支持对request和response的媒体类型进行配置。</p>
+</li>
+<li><p>@ResponseBody</p>
+<p>​    该注解支持将返回值放在response体内，而不是返回一个页面。在很多基于Ajax的程序的时候，可以以此注解返回数据而不是页面；此注解可放置在返回值前或者方法上。</p>
+</li>
+<li><p>@RequestBody</p>
+<p>​    该注解允许request的参数在request体中，而不是直接链接在地址后面。此注解放置在参数前。</p>
+</li>
+<li><p>@PathVariable</p>
+<p>​    该注解用来接收路径参数，如/news/001，可接收001作为参数，此注解放置在参数前。</p>
+</li>
+<li><p>@RestController</p>
+<p>该注解是一个组合注解，组合了@Controller和@ResponseBody，所以在只开发一个和页面交互数据的控制时，需要使用此注解。若没有此注解，想要实现上述功能，则需要在代码中加@Controller和@ResponseBody两个注解。</p>
+</li>
+</ul>
+<p>接下来实现一个各种注解使用的示例。</p>
+<blockquote>
+<p>首先在pom.xml添加jackson依赖，获得对象和json或xml之间的转换：</p>
+</blockquote>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.fasterxml.jackson.dataformat<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jackson-dataformat-xml<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.5.4<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>然后实现用来演示获取request对象参数和返回此对象到response：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> cn.yhc.highlight_springmvc4.domain;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DemoObj</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Long id;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">DemoObj</span><span class="params">()</span></span>&#123;   <span class="comment">//jackson对对象和json做转换时需要此空构造。</span></span><br><span class="line">        <span class="keyword">super</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">DemoObj</span><span class="params">(Long id, String name)</span></span>&#123;</span><br><span class="line">        <span class="keyword">super</span>();</span><br><span class="line">        <span class="keyword">this</span>.id = id;</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Long <span class="title">getId</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> id;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setId</span><span class="params">(Long id)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.id = id;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>注解演示控制器：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> cn.yhc.highlight_springmvc4.web.ch4_3;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> cn.yhc.highlight_springmvc4.domain.DemoObj;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Controller;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.PathVariable;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestMapping;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.ResponseBody;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletRequest;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Controller</span> <span class="comment">//注解声明此类是一个控制器</span></span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/anno"</span>)    <span class="comment">//映射此类的访问路径是/anno。</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DemoAnnoController</span> </span>&#123;</span><br><span class="line">    <span class="meta">@RequestMapping</span>(produces = <span class="string">"text/plain;charset=UTF-8"</span>)  <span class="comment">//方法未标注路径，因此使用类级别的路径/anno，produces参数定制返回的response媒体类型和字符集。</span></span><br><span class="line">    <span class="keyword">public</span> <span class="meta">@ResponseBody</span> <span class="function">String <span class="title">index</span><span class="params">(HttpServletRequest request)</span></span>&#123;  <span class="comment">//演示可接受HttpServletRequest作为参数，也可接受HttpServletResponse作为参数；@ResponseBody注解用在返回值前面。</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"url:"</span> + request.getRequestURL() + <span class="string">"can access"</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping</span>(value = <span class="string">"/pathvar/&#123;str&#125;"</span>, produces = <span class="string">"text/plain;charset=UTF-8"</span>)    <span class="comment">//演示接受路径参数，在方法参数前结合@PathVariable使用。</span></span><br><span class="line">    <span class="keyword">public</span> <span class="meta">@ResponseBody</span> <span class="function">String <span class="title">demoPathVar</span><span class="params">(@PathVariable String str, HttpServletRequest request)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"url:"</span> + request.getRequestURL() + <span class="string">"can access, str: "</span> + str;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping</span>(value = <span class="string">"requestParam"</span>, produces = <span class="string">"text/plain;charset=UTF-8"</span>)  <span class="comment">//演示常规的request参数获取，访问路径为/anno/requestParam?id=1。</span></span><br><span class="line">    <span class="keyword">public</span> <span class="meta">@ResponseBody</span> <span class="function">String <span class="title">passRequestParam</span><span class="params">(Long id, HttpServletRequest request)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"url:"</span> + request.getRequestURL() + <span class="string">" can access, id: "</span> + id;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping</span>(value = <span class="string">"/obj"</span>, produces = <span class="string">"application/json;charset=UTF-8"</span>)    <span class="comment">//演示解释参数到对象，访问路径为/anno/obj?id=1&amp;name=xxx。</span></span><br><span class="line">    <span class="meta">@ResponseBody</span>   <span class="comment">//该注解也可以用在方法上。</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">passObj</span><span class="params">(DemoObj obj, HttpServletRequest request)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"url: "</span> + request.getRequestURL() + <span class="string">"can access, obj id: "</span> + obj.getId() + <span class="string">"obj name: "</span> + obj.getName();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping</span>(value = &#123;<span class="string">"/name1"</span>, <span class="string">"/name2"</span>&#125;, produces = <span class="string">"text/plain;charset=UTF-8"</span>)    <span class="comment">//演示映射不同路径到相同的方法上，访问路径为/anno/name1，/anno/name2。</span></span><br><span class="line">    <span class="keyword">public</span> <span class="meta">@ResponseBody</span> <span class="function">String <span class="title">remove</span><span class="params">(HttpServletRequest request)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"url: "</span> + request.getRequestURL() + <span class="string">"can access"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>上面提到也可以使用@RestController注解进行演示：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> cn.yhc.highlight_springmvc4.web.ch4_3;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> cn.yhc.highlight_springmvc4.domain.DemoObj;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestMapping;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RestController;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RestController</span> <span class="comment">//该注解声明是控制器，并且返回数据时不需要@ResponseBody。</span></span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/rest"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DemoRestController</span> </span>&#123;</span><br><span class="line">    <span class="meta">@RequestMapping</span>(value = <span class="string">"/getjson"</span>,produces = &#123;<span class="string">"application/json;charset=UTF-8"</span>&#125;)   <span class="comment">//返回数据的媒体类型为json。</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> DemoObj <span class="title">getjson</span><span class="params">(DemoObj obj)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> DemoObj(obj.getId()+<span class="number">1</span>, obj.getName()+<span class="string">"yyy"</span>); <span class="comment">//直接返回对象，对象会自动转换成json。</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping</span>(value = <span class="string">"/getxml"</span>, produces = &#123;<span class="string">"application/xml;charset=UTF-8"</span>&#125;)    <span class="comment">//返回数据的媒体类型为xml。</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> DemoObj <span class="title">getxml</span><span class="params">(DemoObj obj)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> DemoObj(obj.getId()+<span class="number">1</span>, obj.getName()+<span class="string">"yyy"</span>); <span class="comment">//直接返回对象，对象会自动转换成xml。</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>最后运行项目，对部分实现进行验证：</p>
+<p><img src="4.3_1.png" alt=""></p>
+<p><img src="4.3_2.png" alt=""></p>
+<p><img src="4.3_3.png" alt=""></p>
+<p><img src="4.3_4.png" alt=""></p>
+<h4 id="Spring-MVC基本配置"><a href="#Spring-MVC基本配置" class="headerlink" title="Spring MVC基本配置"></a>Spring MVC基本配置</h4>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yehengchao.cn/2018/06/30/Spring高级话题/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1961,7 +2184,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1983,7 +2206,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
