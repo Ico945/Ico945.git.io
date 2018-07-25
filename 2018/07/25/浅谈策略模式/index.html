@@ -83,7 +83,7 @@
 
 
 
-  <meta name="keywords" content="jvm," />
+  <meta name="keywords" content="设计模式,策略模式," />
 
 
 
@@ -96,18 +96,18 @@
 
 
 
-<meta name="description" content="JDK工具使用：主要记录一些JDK工具使用，包括内存监视和快照生成查看等一系列可视化工具。&amp;lt;未完待续&amp;gt;">
-<meta name="keywords" content="jvm">
+<meta name="description" content="设计模式之策略模式">
+<meta name="keywords" content="设计模式,策略模式">
 <meta property="og:type" content="article">
-<meta property="og:title" content="虚拟机性能监控与故障处理工具">
-<meta property="og:url" content="http://yehengchao.cn/2018/06/20/虚拟机性能监控与故障处理工具/index.html">
+<meta property="og:title" content="浅谈策略模式">
+<meta property="og:url" content="http://yehengchao.cn/2018/07/25/浅谈策略模式/index.html">
 <meta property="og:site_name" content="南寒">
-<meta property="og:description" content="JDK工具使用：主要记录一些JDK工具使用，包括内存监视和快照生成查看等一系列可视化工具。&amp;lt;未完待续&amp;gt;">
+<meta property="og:description" content="设计模式之策略模式">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-07-02T01:11:01.839Z">
+<meta property="og:updated_time" content="2018-07-25T14:18:18.094Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="虚拟机性能监控与故障处理工具">
-<meta name="twitter:description" content="JDK工具使用：主要记录一些JDK工具使用，包括内存监视和快照生成查看等一系列可视化工具。&amp;lt;未完待续&amp;gt;">
+<meta name="twitter:title" content="浅谈策略模式">
+<meta name="twitter:description" content="设计模式之策略模式">
 
 
 
@@ -137,13 +137,13 @@
 
 
 
-  <link rel="canonical" href="http://yehengchao.cn/2018/06/20/虚拟机性能监控与故障处理工具/"/>
+  <link rel="canonical" href="http://yehengchao.cn/2018/07/25/浅谈策略模式/"/>
 
 
 
 
 
-  <title>虚拟机性能监控与故障处理工具 | 南寒</title>
+  <title>浅谈策略模式 | 南寒</title>
   
 
 
@@ -314,7 +314,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yehengchao.cn/2018/06/20/虚拟机性能监控与故障处理工具/">
+    <link itemprop="mainEntityOfPage" href="http://yehengchao.cn/2018/07/25/浅谈策略模式/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ico">
@@ -331,7 +331,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">虚拟机性能监控与故障处理工具</h1>
+          <h1 class="post-title" itemprop="name headline">浅谈策略模式</h1>
         
 
         <div class="post-meta">
@@ -343,8 +343,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-20T09:52:46+08:00">
-                2018-06-20
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-25T22:11:19+08:00">
+                2018-07-25
               </time>
             
 
@@ -366,8 +366,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/jvm/" itemprop="url" rel="index">
-                    <span itemprop="name">jvm</span>
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
                   </a>
                 </span>
 
@@ -402,7 +402,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  504
+                  1,946
                 </span>
               
 
@@ -418,7 +418,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  2
+                  7
                 </span>
               
             </div>
@@ -440,18 +440,57 @@
 
       
         <blockquote>
-<p>JDK工具使用：主要记录一些JDK工具使用，包括内存监视和快照生成查看等一系列可视化工具。&lt;未完待续&gt;</p>
+<p>设计模式之策略模式</p>
 </blockquote>
 <a id="more"></a>
-<h4 id="4-2-JDK的命令行工具"><a href="#4-2-JDK的命令行工具" class="headerlink" title="4.2 JDK的命令行工具"></a>4.2 JDK的命令行工具</h4><!-- more -->
-<h5 id="4-2-1-jps：虚拟机进程状况工具"><a href="#4-2-1-jps：虚拟机进程状况工具" class="headerlink" title="4.2.1 jps：虚拟机进程状况工具"></a>4.2.1 jps：虚拟机进程状况工具</h5><p>​    其功能和UNIX中的ps命令相似：列出正在进行的虚拟机进程，并显示虚拟机执行主类（Main Class，main()函数所在的类）名称及进程的本地虚拟机唯一ID(LVMID)。</p>
-<h5 id="4-2-2-jstat：虚拟机统计信息监视工具"><a href="#4-2-2-jstat：虚拟机统计信息监视工具" class="headerlink" title="4.2.2 jstat：虚拟机统计信息监视工具"></a>4.2.2 jstat：虚拟机统计信息监视工具</h5><p>​    用于监视虚拟机各种运行状态信息的命令行工具，可以显示远程或者本地虚拟机进程中的类装载、内存、垃圾收集、JIT编译等运行数据。</p>
-<h5 id="4-2-3-jinfo：Java配置信息工具"><a href="#4-2-3-jinfo：Java配置信息工具" class="headerlink" title="4.2.3 jinfo：Java配置信息工具"></a>4.2.3 jinfo：Java配置信息工具</h5><p>​    该工具可以实时地查看和调整虚拟机各项参数。</p>
-<h5 id="4-2-4-jmap：Java内存映像工具"><a href="#4-2-4-jmap：Java内存映像工具" class="headerlink" title="4.2.4 jmap：Java内存映像工具"></a>4.2.4 jmap：Java内存映像工具</h5><p>​    该命令用于生成堆转储快照（称为dump文件）。</p>
-<h5 id="4-2-5-jhat：虚拟机堆转储快照分析工具"><a href="#4-2-5-jhat：虚拟机堆转储快照分析工具" class="headerlink" title="4.2.5 jhat：虚拟机堆转储快照分析工具"></a>4.2.5 jhat：虚拟机堆转储快照分析工具</h5><p>​    该命令与jmap搭配使用，来分析jmap生成的dump文件，不过实际上一般不会直接使用jhat来分析dump文件，两个原因：1. 一般不在部署应用的服务器上直接分析dump，即使这样做也会尽量将dump复制到其他机器上分析；2. jhat分析功能比较简陋，还有其他强大的工具可以选择。</p>
-<h5 id="4-2-6-jstack：Java堆栈跟踪工具"><a href="#4-2-6-jstack：Java堆栈跟踪工具" class="headerlink" title="4.2.6 jstack：Java堆栈跟踪工具"></a>4.2.6 jstack：Java堆栈跟踪工具</h5><p>​    该命令用于生成虚拟机当前时刻的线程快照（一般称为threaddump或者javacore文件）。其主要目的是定位线程出现长时间停顿的原因，如线程间死锁、死循环、请求外部资源导致的长时间等待等。</p>
-<h5 id="4-2-7-HSDIS：JIT生成代码反汇编"><a href="#4-2-7-HSDIS：JIT生成代码反汇编" class="headerlink" title="4.2.7 HSDIS：JIT生成代码反汇编"></a>4.2.7 HSDIS：JIT生成代码反汇编</h5><p>​    将本地代码还原为汇编代码输出（没成功）。</p>
-<h4 id="4-3-JDK的可视化工具"><a href="#4-3-JDK的可视化工具" class="headerlink" title="4.3 JDK的可视化工具"></a>4.3 JDK的可视化工具</h4><h5 id="4-3-1-JConsole：Java监视与管理控制台"><a href="#4-3-1-JConsole：Java监视与管理控制台" class="headerlink" title="4.3.1 JConsole：Java监视与管理控制台"></a>4.3.1 JConsole：Java监视与管理控制台</h5><p>​        </p>
+<p>首先，给出策略模式的定义：策略模式定义了算法族，分别封装起来，让他们之间可以互相替换，此模式可以让算法的变化独立于使用算法的客户。</p>
+<h5 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h5><p>为了引出为什么使用策略模式，先说说不用这个模式之前是怎么做的。从简单的模拟鸭子应用开始，首先需要设计一套模拟鸭子的游戏，游戏中会出现各种类型的鸭子，一边游泳戏水，一边呱呱叫。系统内部使用标准的OO技术，设计了一个鸭子超类（SuperClass），并让各种鸭子继承超类。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Duck</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">quack</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">swim</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">display</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MallardDuck</span> <span class="keyword">extends</span> <span class="title">Duck</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">display</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="comment">//外观是绿头</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">RedheadDuck</span> <span class="keyword">extends</span> <span class="title">Duck</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">display</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="comment">//外观是红头</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后公司因为竞争压力巨大。客户需要改需求了，他们说要让鸭子会飞；主管也表示会飞的鸭子来将竞争者抛在后头。所以这个时候首先想到最直观的方法当然就是直接在超类中添加飞的方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Duck</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">quack</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">swim</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">display</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">fly</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>但是这样一来问题出现了，一些本来不应该会飞的鸭子也在空中飞来飞去了，比如之前继承超类实现的橡皮鸭。直接在超类中加上新的行为会使得某些并不适合该行为的子类也具有该行为。</p>
+<h5 id="分开变化和不变的部分"><a href="#分开变化和不变的部分" class="headerlink" title="分开变化和不变的部分"></a>分开变化和不变的部分</h5><p>所以这里提出了第一个设计原则：<strong>找出应用中可能需要变化之处，把他们独立出来，不要和那些不需要变化的代码混在一起。</strong></p>
+<p>意思就是说如果每次新的需求一来，都会使某方面的代码发生变化，那就可以确定这部分代码需要被抽离出来，和其他稳定的代码有所区分。</p>
+<p>换个思考方式：把会变化的部分取出来并封装起来，以便以后可以轻易地改动或扩充此部分，而不影响不需要变化的其他部分。</p>
+<p>所以这里以鸭子为例，把变化的和不变化的部分分开来，就目前所知除了fly()和quack()的问题之外，其他行为还算正常，没有特别需要改变的地方。所以现在准备建立两组类（完全远离Duck类），一个是“fly”相关的，一个是“quack”相关的，每组类将实现各自的动作。比如叫声不一样实现“呱呱叫”、“吱吱叫”、“安静不叫”。</p>
+<h5 id="设计鸭子的行为"><a href="#设计鸭子的行为" class="headerlink" title="设计鸭子的行为"></a>设计鸭子的行为</h5><p>那我们如何设计实现飞行和呱呱叫的行为类呢？我们希望一切能有弹性，我们想能够“指定”行为到鸭子的实例。比如，想要产生一个新的绿头鸭的示例，并指定特定“类型”的飞行行为给他。干脆顺便让鸭子的行为可以动态地改变好了。</p>
+<p>所以这里提出了第二个设计原则：<strong>针对接口编程，而不死针对实现编程。</strong></p>
+<p>利用接口代表每个行为，比如FlyBehavior与QuackBehavior，而行为的实现都将实现其中的一个接口。所以鸭子类不会负责实现Flying与Quacking接口，反而制造一组其他类专门实现这两个行为。</p>
+<p>所以新的设计中，鸭子的子类将使用接口（FlyBehavior与QuackBehavior）所表示的行为，实际的“实现”不会被绑死在鸭子的子类中。</p>
+<p>这里所说的针对接口编程的接口并不是一定要用到Java的interface构造，其关键在于<strong>多态</strong>。利用多态，程序可以针对超类型编程，执行时会根据实际状况执行到真正的行为，不会被绑死在超类型的行为上（向上转型）。举个例子：</p>
+<p>针对实现编程：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Dog d = <span class="keyword">new</span> Dog();</span><br><span class="line">d.bark();</span><br></pre></td></tr></table></figure>
+<p>但是，针对接口/超类型编程：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Animal</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">makeSound</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dog</span> <span class="keyword">extends</span> <span class="title">Animal</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">makeSound</span><span class="params">()</span></span>&#123;</span><br><span class="line">        bark();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">bark</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Cat</span> <span class="keyword">extends</span> <span class="title">Animal</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">makeSound</span><span class="params">()</span></span>&#123;</span><br><span class="line">        meow();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">meow</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line">Animal animal = <span class="keyword">new</span> Dog();</span><br><span class="line">animal.makeSound();</span><br></pre></td></tr></table></figure>
+<p>这样做的好处就是，子类的实例化动作不再需要在代码中硬编码，例如 <em>new Dog()</em> ，<strong>而是在运行是才指定具体的实现的对象</strong>。</p>
+<h5 id="鸭子的行为"><a href="#鸭子的行为" class="headerlink" title="鸭子的行为"></a>鸭子的行为</h5><p>所以为了将鸭子的叫和飞这两种行为分离开来，实现了两个接口：FlyBehavior和QuackBehavior，还有他们对应的类：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">FlyBehavior</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">fly</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FlyWithWings</span> <span class="keyword">implements</span> <span class="title">FlyBehavior</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">fly</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="comment">//实现鸭子飞行</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FlyNoway</span> <span class="keyword">implements</span> <span class="title">FlyBehavior</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">fly</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="comment">//什么都不做，不会飞</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">QuackBehavior</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">quack</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Quack</span> <span class="keyword">implements</span> <span class="title">QuackBehavior</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">quack</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="comment">//实现鸭子呱呱叫</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Squeak</span> <span class="keyword">implements</span> <span class="title">QuackBehavior</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">quack</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="comment">//橡皮鸭子吱吱叫</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MuteQuack</span> <span class="keyword">implements</span> <span class="title">QuackBehavior</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">quack</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="comment">//什么都不做，不会叫</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样的设计，可以让飞行和呱呱叫的动作被其他对象复用，因为这些行为已经和鸭子类无关了。而可以新增一些行为，不会影响到既有的行为类，也不会影响“使用”到飞行行为的鸭子类。<strong>有了继承的好处，却没有继承所带来的包袱</strong>。</p>
+<h5 id="整合鸭子行为"><a href="#整合鸭子行为" class="headerlink" title="整合鸭子行为"></a>整合鸭子行为</h5><p>这样做的关键在于，鸭子现在将飞行和呱呱叫的动作“委托”给别人处理，而不是使用定义在Duck()类（或子类）内的呱呱叫和飞行方法。</p>
+<ul>
+<li><p>首先，在Duck类中加入两个示例变量，分别为“flyBehavior”与“quackBehavior”，声明为接口类型，每个鸭子对象动态的设置这样变量以在运行时引用正确的行为类型（FlyWithWings、Squeak等）。</p>
+</li>
+<li><p>然后实现表现类：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Duck</span> </span>&#123;</span><br><span class="line">    QuackBehavior quckBehavior;</span><br><span class="line">    <span class="comment">//其他省略</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">performQuack</span><span class="params">()</span></span>&#123;</span><br><span class="line">        quckBehavior.quack();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>最后设定flyBehavior与quackBehavior的实例对象。以MallardDuck为例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MallardDuck</span> <span class="keyword">extends</span> <span class="title">Duck</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MallardDuck</span><span class="params">()</span></span>&#123;</span><br><span class="line">        quckBehavior = <span class="keyword">new</span> Quack();</span><br><span class="line">        flyBehavior = <span class="keyword">new</span> FlyWithWings();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">display</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="comment">//绿头鸭</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h5 id="动态设定行为"><a href="#动态设定行为" class="headerlink" title="动态设定行为"></a>动态设定行为</h5><p>假设在鸭子类中通过设定方法（setter method）来设定鸭子的行为，而不是在鸭子的构造器内部实例化。</p>
+<p>在Duck类中加入下面方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">setFlyBehavior</span><span class="params">(FlyBehavior fb)</span> </span>&#123;</span><br><span class="line">    flyBehavior = fb;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">setQuackBehavior</span><span class="params">(QuackBehavior qb)</span> </span>&#123;</span><br><span class="line">    quackBehavior = qb;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样一来就可以随时调用这两个方法改变鸭子的行为。</p>
+<p>比如，一开始制造一个新的鸭子类型，是不会飞的：模型鸭（ModelDuck）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ModelDuck</span> <span class="keyword">extends</span> <span class="title">Duck</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ModelDuck</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        flyBehavior = <span class="keyword">new</span> FlyNoWay();</span><br><span class="line">        quackBehavior = <span class="keyword">new</span> Quack();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">display</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="comment">//xxxxxx</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>此时建立一个新的飞行方式，火箭。。（FlyRocketPowered）：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FlyRocketPowered</span> <span class="keyword">implements</span> <span class="title">FlyBehavior</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">fly</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">//火箭飞行</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后使用setter方法将该飞行模式加到模型鸭上去，使其具有火煎动力：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Duck model = <span class="keyword">new</span> ModelDuck();</span><br><span class="line">model.setFlyBehavior(<span class="keyword">new</span> FlyRocketPowered());</span><br></pre></td></tr></table></figure>
+<h5 id="“有一个”的关系"><a href="#“有一个”的关系" class="headerlink" title="“有一个”的关系"></a>“有一个”的关系</h5><p>上面的例子每一个鸭子都有一个FlyBehavior和一个QuackBehavior，好将飞行和叫委托给他们代为处理。这种将两个类结合起来使用的方式就是组合，这种做法和继承的不同之处在于：鸭子的行为不是继承来的，而是和适当的行为对象组合来的。</p>
+<p>这里有一个很重要的设计原则：<strong>多用组合，少用继承</strong>。</p>
+<p>使用组合建立系统具有很大的弹性，不仅可以将算法封装成类，更可以“在运行时动态地改变行为”，只要组合的行为对象符合正确的接口标准即可。</p>
 
       
     </div>
@@ -469,7 +508,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/jvm/" rel="tag"># jvm</a>
+            <a href="/tags/设计模式/" rel="tag"># 设计模式</a>
+          
+            <a href="/tags/策略模式/" rel="tag"># 策略模式</a>
           
         </div>
       
@@ -482,8 +523,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/06/20/垃圾收集和内存分配/" rel="next" title="垃圾收集和内存分配">
-                <i class="fa fa-chevron-left"></i> 垃圾收集和内存分配
+              <a href="/2018/07/03/SpringMVC基础/" rel="next" title="SpringMVC基础">
+                <i class="fa fa-chevron-left"></i> SpringMVC基础
               </a>
             
           </div>
@@ -491,10 +532,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/06/20/调优案例分析与实战/" rel="prev" title="调优案例分析与实战">
-                调优案例分析与实战 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -679,7 +716,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-JDK的命令行工具"><span class="nav-number">1.</span> <span class="nav-text">4.2 JDK的命令行工具</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#4-2-1-jps：虚拟机进程状况工具"><span class="nav-number">1.1.</span> <span class="nav-text">4.2.1 jps：虚拟机进程状况工具</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-2-2-jstat：虚拟机统计信息监视工具"><span class="nav-number">1.2.</span> <span class="nav-text">4.2.2 jstat：虚拟机统计信息监视工具</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-2-3-jinfo：Java配置信息工具"><span class="nav-number">1.3.</span> <span class="nav-text">4.2.3 jinfo：Java配置信息工具</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-2-4-jmap：Java内存映像工具"><span class="nav-number">1.4.</span> <span class="nav-text">4.2.4 jmap：Java内存映像工具</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-2-5-jhat：虚拟机堆转储快照分析工具"><span class="nav-number">1.5.</span> <span class="nav-text">4.2.5 jhat：虚拟机堆转储快照分析工具</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-2-6-jstack：Java堆栈跟踪工具"><span class="nav-number">1.6.</span> <span class="nav-text">4.2.6 jstack：Java堆栈跟踪工具</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-2-7-HSDIS：JIT生成代码反汇编"><span class="nav-number">1.7.</span> <span class="nav-text">4.2.7 HSDIS：JIT生成代码反汇编</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-3-JDK的可视化工具"><span class="nav-number">2.</span> <span class="nav-text">4.3 JDK的可视化工具</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#4-3-1-JConsole：Java监视与管理控制台"><span class="nav-number">2.1.</span> <span class="nav-text">4.3.1 JConsole：Java监视与管理控制台</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#例子"><span class="nav-number">1.</span> <span class="nav-text">例子</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#分开变化和不变的部分"><span class="nav-number">2.</span> <span class="nav-text">分开变化和不变的部分</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#设计鸭子的行为"><span class="nav-number">3.</span> <span class="nav-text">设计鸭子的行为</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#鸭子的行为"><span class="nav-number">4.</span> <span class="nav-text">鸭子的行为</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#整合鸭子行为"><span class="nav-number">5.</span> <span class="nav-text">整合鸭子行为</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#动态设定行为"><span class="nav-number">6.</span> <span class="nav-text">动态设定行为</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#“有一个”的关系"><span class="nav-number">7.</span> <span class="nav-text">“有一个”的关系</span></a></li></ol></div>
             
 
           </div>
