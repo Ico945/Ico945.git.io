@@ -83,7 +83,7 @@
 
 
 
-  <meta name="keywords" content="ico,yhc" />
+  <meta name="keywords" content="javaweb,session,cookie," />
 
 
 
@@ -96,17 +96,18 @@
 
 
 
-<meta name="description" content="脾气古怪，性格孤僻。">
+<meta name="description" content="写一写我所理解的cookie和session，可能有错随时改~">
+<meta name="keywords" content="javaweb,session,cookie">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Session和Cookie">
 <meta property="og:url" content="http://yehengchao.cn/2018/08/07/Session和Cookie/index.html">
 <meta property="og:site_name" content="南寒">
-<meta property="og:description" content="脾气古怪，性格孤僻。">
+<meta property="og:description" content="写一写我所理解的cookie和session，可能有错随时改~">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-08-07T07:50:21.423Z">
+<meta property="og:updated_time" content="2018-08-12T08:15:46.756Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Session和Cookie">
-<meta name="twitter:description" content="脾气古怪，性格孤僻。">
+<meta name="twitter:description" content="写一写我所理解的cookie和session，可能有错随时改~">
 
 
 
@@ -353,6 +354,28 @@
           </span>
 
           
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/web/" itemprop="url" rel="index">
+                    <span itemprop="name">web</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
 
           
             
@@ -379,7 +402,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  0
+                  578
                 </span>
               
 
@@ -395,7 +418,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  1
+                  2
                 </span>
               
             </div>
@@ -416,7 +439,20 @@
       
 
       
-        
+        <p>写一写我所理解的cookie和session，可能有错随时改~</p>
+<a id="more"></a>
+<h4 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h4><p>Session和Cookie的作用都是为了保存访问用户的状态信息。由于Http是无状态的协议，所以服务端需要记录用户的状态时就需要用某种机制来识别具体的用户这就是Session。</p>
+<h4 id="Cookie"><a href="#Cookie" class="headerlink" title="Cookie"></a>Cookie</h4><p>那cookie又是什么？每次进行Http请求的时候客户端都会发送相应的cookie信息给服务端一般这个信息里面包含了一个ID，服务端通过对这个ID进行识别来判断你是哪个。</p>
+<p>当然cookie不止能发送一个ID，它的内容主要包括：名字、值、过期时间、路径和域。我们可以设置cookie的生命周期，若不设置默认为浏览器会话期间，关闭浏览器cookie就失效了。</p>
+<h4 id="Session"><a href="#Session" class="headerlink" title="Session"></a>Session</h4><p>前面介绍了cookie可以让服务端程序跟踪每个客户端的访问，但是每次客户端在访问时都必须传回这些cookie，如果cookie很多则增加了客户端和服务端的数据传输量，所以session出现了。同一个客户端和服务端交互时不需要每次都传回所有的cookie值，而是只要传回一个ID，这个ID是客户端第一次访问服务端时生成的，且每个客户端是唯一的，这样客户只要传回这个ID就行了，其它信息保存在服务端。</p>
+<h4 id="Session和Cookie协同"><a href="#Session和Cookie协同" class="headerlink" title="Session和Cookie协同"></a>Session和Cookie协同</h4><p>那么session是如何利用cookie来进行工作的？实际上有三种方法：</p>
+<ul>
+<li>基于URL Path Parameter，默认支持。</li>
+<li>基于Cookie，如果没有修改Context容器的Cookie标识，则默认也是支持的。</li>
+<li>基于SSL，默认不支持，只有connector.getAttribute(“SSLEnabled”)为true的时候才支持。</li>
+</ul>
+<p>在第一种情况下，在用户浏览器不支持或者禁用的时候，浏览器会将用户的SessionCookieName重写到用户请求的URL参数中，服务器从这个路径参数中拿到用户配置的SessionCookieName，如果在后台的配置文件(web.xml)中配置session-config下的name属性就是这个SessionCookieName的值。如果没有配置，默认SessionCookieName就是熟悉的”JSESSIONID”。需要说明的是，与session关联的cookie与其他cookie没有什么不同。</p>
+
       
     </div>
     
@@ -430,6 +466,16 @@
     
 
     <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/javaweb/" rel="tag"># javaweb</a>
+          
+            <a href="/tags/session/" rel="tag"># session</a>
+          
+            <a href="/tags/cookie/" rel="tag"># cookie</a>
+          
+        </div>
       
 
       
@@ -500,8 +546,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -531,7 +586,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-count">5</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -542,7 +597,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-count">17</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -614,6 +669,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#起因"><span class="nav-number">1.</span> <span class="nav-text">起因</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Cookie"><span class="nav-number">2.</span> <span class="nav-text">Cookie</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Session"><span class="nav-number">3.</span> <span class="nav-text">Session</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Session和Cookie协同"><span class="nav-number">4.</span> <span class="nav-text">Session和Cookie协同</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       

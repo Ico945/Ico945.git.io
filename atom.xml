@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yehengchao.cn/"/>
-  <updated>2018-08-07T07:50:21.423Z</updated>
+  <updated>2018-08-12T08:15:46.756Z</updated>
   <id>http://yehengchao.cn/</id>
   
   <author>
@@ -21,12 +21,24 @@
     <link href="http://yehengchao.cn/2018/08/07/Session%E5%92%8CCookie/"/>
     <id>http://yehengchao.cn/2018/08/07/Session和Cookie/</id>
     <published>2018-08-07T07:50:21.000Z</published>
-    <updated>2018-08-07T07:50:21.423Z</updated>
+    <updated>2018-08-12T08:15:46.756Z</updated>
+    
+    <content type="html"><![CDATA[<p>写一写我所理解的cookie和session，可能有错随时改~</p><a id="more"></a><h4 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h4><p>Session和Cookie的作用都是为了保存访问用户的状态信息。由于Http是无状态的协议，所以服务端需要记录用户的状态时就需要用某种机制来识别具体的用户这就是Session。</p><h4 id="Cookie"><a href="#Cookie" class="headerlink" title="Cookie"></a>Cookie</h4><p>那cookie又是什么？每次进行Http请求的时候客户端都会发送相应的cookie信息给服务端一般这个信息里面包含了一个ID，服务端通过对这个ID进行识别来判断你是哪个。</p><p>当然cookie不止能发送一个ID，它的内容主要包括：名字、值、过期时间、路径和域。我们可以设置cookie的生命周期，若不设置默认为浏览器会话期间，关闭浏览器cookie就失效了。</p><h4 id="Session"><a href="#Session" class="headerlink" title="Session"></a>Session</h4><p>前面介绍了cookie可以让服务端程序跟踪每个客户端的访问，但是每次客户端在访问时都必须传回这些cookie，如果cookie很多则增加了客户端和服务端的数据传输量，所以session出现了。同一个客户端和服务端交互时不需要每次都传回所有的cookie值，而是只要传回一个ID，这个ID是客户端第一次访问服务端时生成的，且每个客户端是唯一的，这样客户只要传回这个ID就行了，其它信息保存在服务端。</p><h4 id="Session和Cookie协同"><a href="#Session和Cookie协同" class="headerlink" title="Session和Cookie协同"></a>Session和Cookie协同</h4><p>那么session是如何利用cookie来进行工作的？实际上有三种方法：</p><ul><li>基于URL Path Parameter，默认支持。</li><li>基于Cookie，如果没有修改Context容器的Cookie标识，则默认也是支持的。</li><li>基于SSL，默认不支持，只有connector.getAttribute(“SSLEnabled”)为true的时候才支持。</li></ul><p>在第一种情况下，在用户浏览器不支持或者禁用的时候，浏览器会将用户的SessionCookieName重写到用户请求的URL参数中，服务器从这个路径参数中拿到用户配置的SessionCookieName，如果在后台的配置文件(web.xml)中配置session-config下的name属性就是这个SessionCookieName的值。如果没有配置，默认SessionCookieName就是熟悉的”JSESSIONID”。需要说明的是，与session关联的cookie与其他cookie没有什么不同。</p>]]></content>
     
     <summary type="html">
     
+      &lt;p&gt;写一写我所理解的cookie和session，可能有错随时改~&lt;/p&gt;
+    
     </summary>
     
+      <category term="web" scheme="http://yehengchao.cn/categories/web/"/>
+    
+    
+      <category term="javaweb" scheme="http://yehengchao.cn/tags/javaweb/"/>
+    
+      <category term="session" scheme="http://yehengchao.cn/tags/session/"/>
+    
+      <category term="cookie" scheme="http://yehengchao.cn/tags/cookie/"/>
     
   </entry>
   
