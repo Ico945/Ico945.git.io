@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title></title>
+    <url>%2F2019%2F08%2F13%2FInteger%E6%80%9D%E8%80%83%2F</url>
+    <content type="text"><![CDATA[一道题引发的思考 Integer思考起因今天在学习SpringBoot的时候看到了小马哥的博客，顺藤摸瓜看到了小马哥的github以及其中有个project叫每日一问，最新一个问题如下： 1234567891011121314151617181920public class MyMap &#123; public static void main(String[] args) &#123; Map map = new IdentityHashMap&lt;&gt;(); map.put(1, "Hello"); map.putIfAbsent(1, "World"); print(map.get(1)); print(map.size()); map.put(1024, "A"); map.putIfAbsent(1024, "B"); print(map.get(1024)); print(map.size()); &#125; private static void print(Object object) &#123; System.out.print(object + " "); &#125;&#125; 问应该输出什么？ OK这种问题一向能勾起我的好奇心；首先 IdentityHashMap ，因为平时用HashMap比较多，所以我就当这个是HashMap的情况的话，那输出的结果就是 Hello 1 A 2 当然不会这么小儿科！然后去看了IdentityHashMap这个Map，发现事情并不简单： IdentityHashMap判断两个key是否相等，是通过严格相等即（key1==key2）来判读的，而HashMap是通过equals()方法和hashCode() 这两个方法来判断key是否相等。 这就好解释了，Integer是一个对象，put(1, “World”)还是能成功放进去的，因为 这个“1” != 上个“1”，那这样输出结果应该是 null 2 null 4 这一瞬间感觉自己最diao，没什么是我不会的；赶紧来验证一下:-) ，复制、粘贴、运行： Hello 1 null 3 emmmm？怎么和我想得不一样。 思考装逼失败以后，我分析了原因 原来问题主要出在Integer这个封装类上。Integer中有一个静态方法 Integer valueOf 用于自动装箱的时候： 12345public static Integer valueOf(int i) &#123; if (i &gt;= IntegerCache.low &amp;&amp; i &lt;= IntegerCache.high) return IntegerCache.cache[i + (-IntegerCache.low)]; return new Integer(i); &#125; 而这个cache数组是一个（high-low）长度的Integer数组 1234cache = new Integer[(high - low) + 1]; int j = low; for(int k = 0; k &lt; cache.length; k++) cache[k] = new Integer(j++); 所以在这个范围中Integer直接返回的是cache数组中的元素，超过了这个范围才开始 new 新的对象，这个范围是[-128, 127]。 结论了解这个以后再回过头来看这个题就很容易能理解，1在[-128, 127]这个范围中，所以使用putIfAbsent() 方法以及get() 的时候key都是同一个；1024超过了那个范围，所以每次操作都是new的新对象，所以就会put进去，并且取出来是null。]]></content>
+      <categories>
+        <category>jvm</category>
+      </categories>
+      <tags>
+        <tag>java</tag>
+        <tag>JVM</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[阿里巴巴309期百年技术感想]]></title>
     <url>%2F2019%2F08%2F12%2F%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4309%E6%9C%9F%E7%99%BE%E5%B9%B4%E6%8A%80%E6%9C%AF%2F</url>
     <content type="text"><![CDATA[阿里巴巴309期百年技术感想 阿里巴巴309期百年技术2019年8月7日到9日，我开始了为期三天的阿里巴巴百年技术，简称“百技”。在开始之前同部门一起实习的妹子就和我说很辛苦，导致我对这个活动有点害怕。好吧这一天终于来了，现在回想起来那几天确实很辛苦，每一天都感觉没睡醒，不过除了辛苦之外全都是惊喜了，不管是人还是事。 既然是说感想，那就从头开始吧。 第一天对我来说是最大的挑战，因为要上台自我介绍，我本就是一个不擅长表达的人，没办法也只能硬着头皮，上去之前组织了好久的语言，我有个缺点：在台上一紧张就容易语无伦次，所以每次都要努力控制自己。最后不管讲得怎么样，也算是过关了。表达确实是一种必不可少的能力，自己在这方面还需要加强。 主线任务： 我们的队名最后确定，叫：给阿里倒上一杯卡布奇诺，嗯 要说特点的话，算是全场最长的队名吧:-) 。logo也是很有意思的，阿里喝Java（咖啡），还有代表我们来自不同部门 阿里云、高德、饿了么的标记，图是队里一个学过画画、很可爱的妹子画的。 第二个任务是确定商业项目，我们讨论了近三个小时 最终确定的主题是”阿里教育“，细节就不讲了，反正第一天晚上到家都凌晨了:-) 。讨论了很多包括方向、盈利点、商业模式等等。大家的热情都很高，团队合作中分工真的很重要，好的分工和合作很能提高工作效率。 还有值得说的就是当天晚上有阿里达摩院的大佬 飞刀老师关于数据库的技术分享，我真的有认真听，听明白多少都是随缘了:-) 。 最后一个任务就是参加天池比赛”自适应负载均衡的设计实现“，这个任务将”辛苦“提到顶峰了，当天晚上又是凌晨才回去的。小伙伴们都很优秀，他们思考问题的角度，方式都是值得学习的。虽然最后成绩并没有很好，过程最重要吧，比赛期间的图： 最后的话：其实能来阿里实习我真的很开心，因为实验室的原因我从来没想过居然还能出来实习，要感谢我的主管和师兄，从开始投简历到最后拿到offer，再到现在实习总时长半个多月了。期间出现过种种困难，差一点就放弃了这个实习机会，最后还是挺到了现在。想来真是不容易，只能说这趟阿里真的没有白来。 我的表达能力有限，从来都是心里一大堆想说的结果出来寥寥无语。总之这段时间真的很开心，遇到的人都很可爱，希望大家都能转正成功吧！江湖再见。 最后上视频。]]></content>

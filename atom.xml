@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yehengchao.cn/"/>
-  <updated>2019-08-12T01:57:38.867Z</updated>
+  <updated>2019-08-13T11:30:32.223Z</updated>
   <id>http://yehengchao.cn/</id>
   
   <author>
@@ -15,6 +15,30 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title></title>
+    <link href="http://yehengchao.cn/2019/08/13/Integer%E6%80%9D%E8%80%83/"/>
+    <id>http://yehengchao.cn/2019/08/13/Integer思考/</id>
+    <published>2019-08-12T16:00:00.000Z</published>
+    <updated>2019-08-13T11:30:32.223Z</updated>
+    
+    <content type="html"><![CDATA[<p>一道题引发的思考  </p><a id="more"></a><h4 id="Integer思考"><a href="#Integer思考" class="headerlink" title="Integer思考"></a>Integer思考</h4><h5 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h5><p>今天在学习SpringBoot的时候看到了小马哥的博客，顺藤摸瓜看到了小马哥的github以及其中有个project叫每日一问，最新一个问题如下：</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyMap</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Map map = <span class="keyword">new</span> IdentityHashMap&lt;&gt;();</span><br><span class="line">        map.put(<span class="number">1</span>, <span class="string">"Hello"</span>);</span><br><span class="line">        map.putIfAbsent(<span class="number">1</span>, <span class="string">"World"</span>);</span><br><span class="line">        print(map.get(<span class="number">1</span>));</span><br><span class="line">        print(map.size());</span><br><span class="line"></span><br><span class="line">        map.put(<span class="number">1024</span>, <span class="string">"A"</span>);</span><br><span class="line">        map.putIfAbsent(<span class="number">1024</span>, <span class="string">"B"</span>);</span><br><span class="line">        print(map.get(<span class="number">1024</span>));</span><br><span class="line">        print(map.size());</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">print</span><span class="params">(Object object)</span> </span>&#123;</span><br><span class="line">        System.out.print(object + <span class="string">" "</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>问应该输出什么？</p><p>OK这种问题一向能勾起我的好奇心；首先 IdentityHashMap ，因为平时用HashMap比较多，所以我就当这个是HashMap的情况的话，那输出的结果就是</p><blockquote><p>Hello 1 A 2 </p></blockquote><p>当然不会这么小儿科！然后去看了IdentityHashMap这个Map，发现事情并不简单：</p><p>IdentityHashMap判断两个key是否相等，是通过严格相等即（key1==key2）来判读的，而HashMap是通过equals()方法和hashCode() 这两个方法来判断key是否相等。</p><p>这就好解释了，Integer是一个对象，put(1, “World”)还是能成功放进去的，因为 这个“1” != 上个“1”，那这样输出结果应该是</p><blockquote><p>null 2 null 4</p></blockquote><p>这一瞬间感觉自己最diao，没什么是我不会的；赶紧来验证一下:-) ，复制、粘贴、运行：</p><blockquote><p>Hello 1 null 3 </p></blockquote><p>emmmm？怎么和我想得不一样。</p><h5 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h5><p>装逼失败以后，我分析了原因 原来问题主要出在Integer这个封装类上。Integer中有一个静态方法 Integer valueOf 用于自动装箱的时候：</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Integer <span class="title">valueOf</span><span class="params">(<span class="keyword">int</span> i)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (i &gt;= IntegerCache.low &amp;&amp; i &lt;= IntegerCache.high)</span><br><span class="line">            <span class="keyword">return</span> IntegerCache.cache[i + (-IntegerCache.low)];</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Integer(i);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure><p>而这个cache数组是一个（high-low）长度的Integer数组</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cache = <span class="keyword">new</span> Integer[(high - low) + <span class="number">1</span>];</span><br><span class="line">            <span class="keyword">int</span> j = low;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> k = <span class="number">0</span>; k &lt; cache.length; k++)</span><br><span class="line">                cache[k] = <span class="keyword">new</span> Integer(j++);</span><br></pre></td></tr></table></figure><p>所以在这个范围中Integer直接返回的是cache数组中的元素，超过了这个范围才开始 new 新的对象，这个范围是[-128, 127]。</p><h5 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h5><p>了解这个以后再回过头来看这个题就很容易能理解，1在[-128, 127]这个范围中，所以使用putIfAbsent() 方法以及get() 的时候key都是同一个；1024超过了那个范围，所以每次操作都是new的新对象，所以就会put进去，并且取出来是null。</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;一道题引发的思考  &lt;/p&gt;
+    
+    </summary>
+    
+      <category term="jvm" scheme="http://yehengchao.cn/categories/jvm/"/>
+    
+    
+      <category term="java" scheme="http://yehengchao.cn/tags/java/"/>
+    
+      <category term="JVM" scheme="http://yehengchao.cn/tags/JVM/"/>
+    
+  </entry>
   
   <entry>
     <title>阿里巴巴309期百年技术感想</title>
