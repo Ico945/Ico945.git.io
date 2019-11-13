@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>垃圾收集和内存分配 | 南寒</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="关于Java虚拟机GC垃圾收集机制，主要介绍了不同区域所使用的垃圾收集算法，以及他们的结合种类、适用场景。">
+<meta name="keywords" content="jvm,gc">
+<meta property="og:type" content="article">
+<meta property="og:title" content="垃圾收集和内存分配">
+<meta property="og:url" content="http://yehengchao.cn/2018/06/20/垃圾收集和内存分配/index.html">
+<meta property="og:site_name" content="南寒">
+<meta property="og:description" content="关于Java虚拟机GC垃圾收集机制，主要介绍了不同区域所使用的垃圾收集算法，以及他们的结合种类、适用场景。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-07-02T01:08:33.763Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="垃圾收集和内存分配">
+<meta name="twitter:description" content="关于Java虚拟机GC垃圾收集机制，主要介绍了不同区域所使用的垃圾收集算法，以及他们的结合种类、适用场景。">
+  
+    <link rel="alternate" href="/atom.xml" title="南寒" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">南寒</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">这一切都是命运石之门的选择！</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yehengchao.cn"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-垃圾收集和内存分配" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/06/20/垃圾收集和内存分配/" class="article-date">
+  <time datetime="2018-06-20T01:51:44.000Z" itemprop="datePublished">2018-06-20</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/jvm/">jvm</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      垃圾收集和内存分配
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>关于Java虚拟机GC垃圾收集机制，主要介绍了不同区域所使用的垃圾收集算法，以及他们的结合种类、适用场景。</p>
+</blockquote>
+<a id="more"></a>
+<h4 id="3-4-HotSpot算法实现"><a href="#3-4-HotSpot算法实现" class="headerlink" title="3.4 HotSpot算法实现"></a>3.4 HotSpot算法实现</h4><h5 id="3-4-2-安全点"><a href="#3-4-2-安全点" class="headerlink" title="3.4.2  安全点"></a>3.4.2  安全点</h5><p>​    JVM通过GC Roots节点来判断某个对象是否可达，但是如果需要逐个检查的话必然会消耗很多时间，所以需要使用一个名为OopMap的数据结构来记录引用位置的信息（如指令流的起始位置，偏移量等）。</p>
+<p>​    在OopMap的帮助下，JVM可以很快的完成GC Roots的枚举，但是这里会出现一个问题：并不是所有的指令都会生成对应的OopMap数据结构，假设如此需要大量的额外空间，导致GC的空间成本将会变得非常高。这里的解决办法是只在“特定位置”记录这些信息，这样的位置称之为安全点（safe point），当线程执行到safe point的时候才会停顿下来开始GC。这里的safe point选定不能太少也不能太多，太少GC等太久，太多增大运行负荷；这里的设置特征为“是否让程序长时间执行的特征”，最明显的特征就是指令序列的复用比如方法调用、循环跳转、异常跳转等位置。</p>
+<p>​    为了让GC发生是所有线程（不包括JNI调用的线程）都能在最近的安全点停下来，有两种方法：抢先式中断和主动式中断。抢先式：GC发生时，中断所有线程，发现不在安全点的就恢复它使之跑到安全点上（目前几乎不用，不详细表）；主动式：GC发生时，不直接操作线程仅设置一个标志，各个线程在执行的时候主动去轮询这个标志，为真时自动挂起（轮询标志和安全点是重合的）。</p>
+<h5 id="3-4-3-安全区域"><a href="#3-4-3-安全区域" class="headerlink" title="3.4.3 安全区域"></a>3.4.3 安全区域</h5><p>​    安全区域的设定是为了解决程序“不执行”的时候，即未分配CPU时间，因此线程无法响应JVM的中断请求挂起，典型的例子就是Sleep和Block状态。这时需要设置一个安全区域（safe region），安全区域是安全点的一个很大的扩展，设置原则为引用关系不会发生变化的一段代码片段。在线程离开安全区域之前会检查GC是否完成了根节点的枚举，完成的话继续执行，否则等待知道收到可以安全离开安全区域的信号为止。</p>
+<h4 id="3-5-垃圾收集器"><a href="#3-5-垃圾收集器" class="headerlink" title="3.5 垃圾收集器"></a>3.5 垃圾收集器</h4><h5 id="3-5-1-Serial收集器"><a href="#3-5-1-Serial收集器" class="headerlink" title="3.5.1  Serial收集器"></a>3.5.1  Serial收集器</h5><p>​    Serial是一个最基本、发展最久的收集器，单线程，但不仅仅说明它只会使用一个CPU或者一条线程去完成垃圾收集工作，更重要的是它在收集垃圾时必须暂停其他所有线程直到它结束（Stop The World），虽然不科学但是依然是Client模式下默认新生代收集器，优点：简单高效（没有线程交互的开销，专心收垃圾）。在桌面场景中新生代内存往往不大，所以停顿时间可以控制在几十最多一百多毫秒以内。</p>
+<h5 id="3-5-2-ParNew收集器"><a href="#3-5-2-ParNew收集器" class="headerlink" title="3.5.2 ParNew收集器"></a>3.5.2 ParNew收集器</h5><p>​    其实是Serial的多线程版本，只有它能与CMS收集器配合使用；目前新生代的垃圾收集只能从Serial和ParNew中选择，在单CPU的情况下ParNew不比Serial好（甚至由于线程交互的开销不能超过Serial）,但是随着CPU数量的增加，它对于GC时的系统资源的有效利用还是很有好处的。默认开启的线程数与CPU数量相同，可用参数进行限制。</p>
+<h5 id="3-5-3-Parallel-Scavenge收集器"><a href="#3-5-3-Parallel-Scavenge收集器" class="headerlink" title="3.5.3 Parallel Scavenge收集器"></a>3.5.3 Parallel Scavenge收集器</h5><p>​    Parallel Scavenge的关注点和其他收集器不同，CMS等收集器是尽可能地缩短垃圾收集时用户线程的停顿时间，而该收集器目标时达到一个可控制的吞吐量（吞吐量 = 运行用户代码时间 /（运行用户代码时间+垃圾收集时间））。和ParNew相比他们都是使用的复制算法，又是并行的多线程~ 但是不同的是Parallel Scavenge提供了两个参数用于精确控制吞吐量，分别为控制最大垃圾收集停顿时间参数以及直接设置吞吐量大小参数；停顿时间是虚拟机通过设置吞吐量和新生代空间大小来调整的。还有一个自适应调节策略（虚拟机根据系统情况自己调节）也是和ParNew的一个重要区别。</p>
+<h5 id="3-5-4-Serial-Old收集器"><a href="#3-5-4-Serial-Old收集器" class="headerlink" title="3.5.4 Serial Old收集器"></a>3.5.4 Serial Old收集器</h5><p>​    Serial的老年代版本，垃圾回收算法使用的是标记-整理算法。主要两大用途：jdk1.5以及之前版本中与Parallel Scavenge收集器搭配使用；作为CMS收集器的后备预案，在并发收集发生Concurrent Mode Failure 时使用。</p>
+<h5 id="3-5-5-Parallel-Old-收集器"><a href="#3-5-5-Parallel-Old-收集器" class="headerlink" title="3.5.5 Parallel Old 收集器"></a>3.5.5 Parallel Old 收集器</h5><p>​    Parallel Scavenge的老年代版本，使用标记-整理算法。jdk1.6之前Parallel Scavenge较尴尬：因为新生代一旦选择Parallel Scavenge，老年代就只能使用Serial Old，所以无法充分利用多CPU的处理能力。后来有了Parallel Old就可以和它组合使用，真正注重吞吐量了。</p>
+<h5 id="3-5-6-CMS收集器"><a href="#3-5-6-CMS收集器" class="headerlink" title="3.5.6 CMS收集器"></a>3.5.6 CMS收集器</h5><p>​    CMS收集器是一种以获取最短回收停顿时间为目标的收集器。基于“标记-清除”算法实现，运作过程分为四个步骤：初始标记，并发标记，重新标记，并发清除。</p>
+<p>​    初始标记：仅仅标记一下GC Roots能直接关联到的对象，速度快但是需要“Stop The World”。</p>
+<p>​    并发标记：进行GC Roots Tracing的过程，能够与用户线程一起工作。</p>
+<p>​    重新标记：为了修正并发标记期间因用户程序继续运行而导致标记产生变动的那一部分对象的标记记录，此阶段停顿时间比初始标记阶段时间稍长但是远比并发标记时间短，需要“Stop The World”。具体如何实现，做了什么还不清楚暂时不表。</p>
+<p>​    并发清除：清理未被标记的对象（不可达的），与用户线程一起并发执行。</p>
+<p>​    主要特点：并发收集、低停顿。</p>
+<p>缺点：</p>
+<ol>
+<li><p>对CPU资源非常敏感，虽然不会导致用户线程停顿但是会明显占用CPU资源而导致应用程序变慢，总吞吐量降低。CMS默认启动的回收线程数是（CPU数+3）/ 4 。这样导致用户程序执行速度忽然降低难以接受，所以虚拟机提供了“增量式并发收集器”，模拟操作系统使用抢占式来模拟多任务，使GC线程、用户线程交替运行，这样会使整个垃圾收集时间变长。实践证明这种处理效果一般，不提倡使用。</p>
+</li>
+<li><p>无法处理浮动垃圾，浮动垃圾：由于并发清理阶段用户线程的运行产生新的垃圾，这部分垃圾未被标记导致当前周期无法被处理，需等下一周期。所以CMS不能老年代满了再收集，需要设置一部分空间给应用程序，jdk1.6中将启动阈值提高到了92%。但是用户可以通过参数进行设置，如果预留内存无法满足需要（Concurrent Mode Failure），虚拟机会启动后备预案：临时启动Serial Old来重新进行老年区的垃圾收集，这样停顿时间就会很久。如果启动阈值设置过高，会导致大量的“Concurrent Mode Failure”失败，性能大大降低。</p>
+</li>
+<li><p>这个缺点就是“标记-清除”算法普遍存在的了，收集结束会有大量空间碎片产生，当有大对象时无法找到足够大的连续空间来分配，因此提前触发了一次Full GC。为此CMS收集器提供-XX:+UseCMSCompactAtFullCollection开关参数（默认开），用于在进行Full GC时开启碎片合并整理过程，这样停顿时间变长。虚拟机设计者还提供-XX:CMSFullGCsBeforeCompaction，设置多少次不压缩的Full GC以后来一次带压缩的（默认0）。</p>
+<p>这里有个疑问：既然使用“标记-清除”会导致大量空间碎片产生，那为什么不使用“标记-整理”算法呢？遂一顿搜索发现：原来CMS为了获取最短回收停顿时间而将耗时长的设为并发（并发标记和并发清理），如果在并发时通过整理移动了对象的内存，那么线程就会找不到应用对象在哪里。</p>
+</li>
+</ol>
+<h5 id="3-5-7-G1收集器"><a href="#3-5-7-G1收集器" class="headerlink" title="3.5.7 G1收集器"></a>3.5.7 G1收集器</h5><p>​    G1（Garbage-First）收集器是新出的，面向服务端应用的收集器，有如下特点：1.并行与并发，能充分利用多CPU、多核环境缩短STW的时间；2.分代收集，能够采用不同方式处理不同类型的旧对象；3.空间整合，从整体来看是基于“标记-整理”算法实现的收集器，从局部（两个Region之间）上来看是基于“复制”算法实现的（没理解）；4.可预测停顿，G1除了追求低停顿外还建立可预测的停顿时间模型，制定M时间片段内收集垃圾时间不能超过N，其原因在于可以有计划地避免在整个堆中进行全区域的垃圾收集，G1跟踪各个Region中垃圾收集的价值（根据获取空间大小和所需时间）维护一个表，每次优先回收价值高的Region。</p>
+<p>​    Region之间不可能是孤立的，不然检测Region之间的对象引用的时候还得扫描整个Java堆导致效率降低。所以每个Region需维护一个Remembered Set记录该Region被引用对象的相关引用信息，在内存回收时加入Remembered Set的扫描即可。</p>
+<p>G1收集器运作步骤：</p>
+<ol>
+<li>初始标记：和CMS一样，该阶段仅标记一下GC Roots能直接关联的对象并修改TAMS。</li>
+<li>并发标记：从GC Root开始对堆中对象进行可达性分析，找出存活对象，该过程耗时久但是可并发操作。</li>
+<li>最终标记：修正并发标记过程中因用户程序运作而导致产生变化的标记记录，虚拟机将其记录在线程Remembered Set Logs中，并在此阶段将其合并到Remembered Set中，可并行。</li>
+<li>筛选标记：首先对各个Region回收价值和成本进行排序，根据用户期望的停顿时间来制定回收计划，可并行，但是停顿用户线程将大幅提高收集效率。</li>
+</ol>
+<h5 id="3-5-8-GC日志"><a href="#3-5-8-GC日志" class="headerlink" title="3.5.8 GC日志"></a>3.5.8 GC日志</h5><h4 id="3-6-内存分配与回收策略"><a href="#3-6-内存分配与回收策略" class="headerlink" title="3.6 内存分配与回收策略"></a>3.6 内存分配与回收策略</h4><h5 id="3-6-1-对象优先在Eden分配"><a href="#3-6-1-对象优先在Eden分配" class="headerlink" title="3.6.1 对象优先在Eden分配"></a>3.6.1 对象优先在Eden分配</h5><p>​    Eden区和Survivor区都属于新生代，而Eden区存放的对象一般都是生命周期不长的对象（因此使用复制算法进行回收）。</p>
+<h5 id="3-6-2大对象直接进入老年代"><a href="#3-6-2大对象直接进入老年代" class="headerlink" title="3.6.2大对象直接进入老年代"></a>3.6.2大对象直接进入老年代</h5><p>​    所谓大对象指大量连续内存空间的Java对象，最典型的就是很长的字符串以及数组（更坏的消息是遇到一群“朝生夕灭”的“短命大对象”），经常导致内存还有不少就不得不提前触发垃圾收集来获取足够的连续空间来存放他们。可以通过设置-XX:PretenureSizeThreshold参数来设置这个上限值。</p>
+<h5 id="3-6-3-长期存活的对象将进入老年代"><a href="#3-6-3-长期存活的对象将进入老年代" class="headerlink" title="3.6.3 长期存活的对象将进入老年代"></a>3.6.3 长期存活的对象将进入老年代</h5><p>​    通过对象年龄计数器来记录对象，当熬过第一次Minor GC进入Survivor区并将年龄设置为1，接着每熬过一次Minor GC就将年龄加1，当年龄加到一定程度就被晋升入老年代中（默认为15），这个年龄阈值可以通过-XX:MaxTenuringThreshold参数设置。</p>
+<h5 id="3-6-4-动态对象年龄判断"><a href="#3-6-4-动态对象年龄判断" class="headerlink" title="3.6.4 动态对象年龄判断"></a>3.6.4 动态对象年龄判断</h5><p>​    虚拟机并不是永远要求对象年龄达到阈值才晋升老年代的，如果在Survivor中相同年龄的所有对象大小总和大于Survivor空间的一半，年龄大于或等于该年龄的对象就直接进入老年代无需等到要求的阈值年龄了。</p>
+<h5 id="3-6-5-空间分配担保"><a href="#3-6-5-空间分配担保" class="headerlink" title="3.6.5 空间分配担保"></a>3.6.5 空间分配担保</h5><p>​    在发生Minor GC前，虚拟机会检查老年代最大连续可用空间是否大于新生代所有对象总空间，如成立则此次Minor GC是安全的。如不成立，虚拟机检查是否允许担保失败（HandlePromotionFailure参数），若允许则检查老年代最大可用连续空间是否大于历次晋升到老年代对象平均大小，若大于则进行一次有风险的Minor GC，若小于或者设置为不允许担保失败，则进行一次Full GC。</p>
+<p>​    JDK 6 update 24以后规则发生了更改，即不管HandlePromotionFailure参数如何设置，代码中都不会使用它，规则变为只要老年代连续空间大于新生代对象总大小或者历次晋升的平均大小就会进行Minor GC，否则进行Full GC。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yehengchao.cn/2018/06/20/垃圾收集和内存分配/" data-id="ck2ww8kth001ifwv7jz93atgo" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gc/">gc</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/jvm/">jvm</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/06/20/虚拟机性能监控与故障处理工具/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          虚拟机性能监控与故障处理工具
+        
+      </div>
+    </a>
+  
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Springboot/">Springboot</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/jvm/">jvm</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/内存/">内存</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Bean/">Bean</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/I-O/">I/O</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mac/">Mac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SpringAware/">SpringAware</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SpringMVC/">SpringMVC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Springboot/">Springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Windows/">Windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cookie/">cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gc/">gc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javaweb/">javaweb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jvm/">jvm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session/">session</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/socket/">socket</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内存管理/">内存管理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程/">多线程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/注解/">注解</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/策略模式/">策略模式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/观察者模式/">观察者模式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/设计模式/">设计模式</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Bean/" style="font-size: 10px;">Bean</a> <a href="/tags/I-O/" style="font-size: 10px;">I/O</a> <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/Mac/" style="font-size: 10px;">Mac</a> <a href="/tags/Spring/" style="font-size: 10px;">Spring</a> <a href="/tags/SpringAware/" style="font-size: 10px;">SpringAware</a> <a href="/tags/SpringMVC/" style="font-size: 10px;">SpringMVC</a> <a href="/tags/Springboot/" style="font-size: 10px;">Springboot</a> <a href="/tags/Windows/" style="font-size: 10px;">Windows</a> <a href="/tags/cookie/" style="font-size: 10px;">cookie</a> <a href="/tags/gc/" style="font-size: 10px;">gc</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/javaweb/" style="font-size: 10px;">javaweb</a> <a href="/tags/jvm/" style="font-size: 20px;">jvm</a> <a href="/tags/session/" style="font-size: 10px;">session</a> <a href="/tags/socket/" style="font-size: 10px;">socket</a> <a href="/tags/内存管理/" style="font-size: 10px;">内存管理</a> <a href="/tags/多线程/" style="font-size: 10px;">多线程</a> <a href="/tags/日常/" style="font-size: 10px;">日常</a> <a href="/tags/注解/" style="font-size: 10px;">注解</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a> <a href="/tags/策略模式/" style="font-size: 10px;">策略模式</a> <a href="/tags/观察者模式/" style="font-size: 10px;">观察者模式</a> <a href="/tags/设计模式/" style="font-size: 15px;">设计模式</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/08/13/Integer思考/">Java关于Integer的思考</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/12/阿里巴巴309期百年技术/">阿里巴巴309期百年技术感想</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/31/浅析通信IO/">浅析通信IO</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/02/黑苹果安装日志/">黑苹果安装</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/07/Session和Cookie/">Session和Cookie</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 Ico<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

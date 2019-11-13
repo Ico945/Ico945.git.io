@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>虚拟机性能监控与故障处理工具 | 南寒</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="JDK工具使用：主要记录一些JDK工具使用，包括内存监视和快照生成查看等一系列可视化工具。&amp;lt;未完待续&amp;gt;">
+<meta name="keywords" content="jvm">
+<meta property="og:type" content="article">
+<meta property="og:title" content="虚拟机性能监控与故障处理工具">
+<meta property="og:url" content="http://yehengchao.cn/2018/06/20/虚拟机性能监控与故障处理工具/index.html">
+<meta property="og:site_name" content="南寒">
+<meta property="og:description" content="JDK工具使用：主要记录一些JDK工具使用，包括内存监视和快照生成查看等一系列可视化工具。&amp;lt;未完待续&amp;gt;">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-07-02T01:11:01.839Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="虚拟机性能监控与故障处理工具">
+<meta name="twitter:description" content="JDK工具使用：主要记录一些JDK工具使用，包括内存监视和快照生成查看等一系列可视化工具。&amp;lt;未完待续&amp;gt;">
+  
+    <link rel="alternate" href="/atom.xml" title="南寒" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">南寒</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">这一切都是命运石之门的选择！</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yehengchao.cn"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-虚拟机性能监控与故障处理工具" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/06/20/虚拟机性能监控与故障处理工具/" class="article-date">
+  <time datetime="2018-06-20T01:52:46.000Z" itemprop="datePublished">2018-06-20</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/jvm/">jvm</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      虚拟机性能监控与故障处理工具
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>JDK工具使用：主要记录一些JDK工具使用，包括内存监视和快照生成查看等一系列可视化工具。&lt;未完待续&gt;</p>
+</blockquote>
+<a id="more"></a>
+<h4 id="4-2-JDK的命令行工具"><a href="#4-2-JDK的命令行工具" class="headerlink" title="4.2 JDK的命令行工具"></a>4.2 JDK的命令行工具</h4><!-- more -->
+<h5 id="4-2-1-jps：虚拟机进程状况工具"><a href="#4-2-1-jps：虚拟机进程状况工具" class="headerlink" title="4.2.1 jps：虚拟机进程状况工具"></a>4.2.1 jps：虚拟机进程状况工具</h5><p>​    其功能和UNIX中的ps命令相似：列出正在进行的虚拟机进程，并显示虚拟机执行主类（Main Class，main()函数所在的类）名称及进程的本地虚拟机唯一ID(LVMID)。</p>
+<h5 id="4-2-2-jstat：虚拟机统计信息监视工具"><a href="#4-2-2-jstat：虚拟机统计信息监视工具" class="headerlink" title="4.2.2 jstat：虚拟机统计信息监视工具"></a>4.2.2 jstat：虚拟机统计信息监视工具</h5><p>​    用于监视虚拟机各种运行状态信息的命令行工具，可以显示远程或者本地虚拟机进程中的类装载、内存、垃圾收集、JIT编译等运行数据。</p>
+<h5 id="4-2-3-jinfo：Java配置信息工具"><a href="#4-2-3-jinfo：Java配置信息工具" class="headerlink" title="4.2.3 jinfo：Java配置信息工具"></a>4.2.3 jinfo：Java配置信息工具</h5><p>​    该工具可以实时地查看和调整虚拟机各项参数。</p>
+<h5 id="4-2-4-jmap：Java内存映像工具"><a href="#4-2-4-jmap：Java内存映像工具" class="headerlink" title="4.2.4 jmap：Java内存映像工具"></a>4.2.4 jmap：Java内存映像工具</h5><p>​    该命令用于生成堆转储快照（称为dump文件）。</p>
+<h5 id="4-2-5-jhat：虚拟机堆转储快照分析工具"><a href="#4-2-5-jhat：虚拟机堆转储快照分析工具" class="headerlink" title="4.2.5 jhat：虚拟机堆转储快照分析工具"></a>4.2.5 jhat：虚拟机堆转储快照分析工具</h5><p>​    该命令与jmap搭配使用，来分析jmap生成的dump文件，不过实际上一般不会直接使用jhat来分析dump文件，两个原因：1. 一般不在部署应用的服务器上直接分析dump，即使这样做也会尽量将dump复制到其他机器上分析；2. jhat分析功能比较简陋，还有其他强大的工具可以选择。</p>
+<h5 id="4-2-6-jstack：Java堆栈跟踪工具"><a href="#4-2-6-jstack：Java堆栈跟踪工具" class="headerlink" title="4.2.6 jstack：Java堆栈跟踪工具"></a>4.2.6 jstack：Java堆栈跟踪工具</h5><p>​    该命令用于生成虚拟机当前时刻的线程快照（一般称为threaddump或者javacore文件）。其主要目的是定位线程出现长时间停顿的原因，如线程间死锁、死循环、请求外部资源导致的长时间等待等。</p>
+<h5 id="4-2-7-HSDIS：JIT生成代码反汇编"><a href="#4-2-7-HSDIS：JIT生成代码反汇编" class="headerlink" title="4.2.7 HSDIS：JIT生成代码反汇编"></a>4.2.7 HSDIS：JIT生成代码反汇编</h5><p>​    将本地代码还原为汇编代码输出（没成功）。</p>
+<h4 id="4-3-JDK的可视化工具"><a href="#4-3-JDK的可视化工具" class="headerlink" title="4.3 JDK的可视化工具"></a>4.3 JDK的可视化工具</h4><h5 id="4-3-1-JConsole：Java监视与管理控制台"><a href="#4-3-1-JConsole：Java监视与管理控制台" class="headerlink" title="4.3.1 JConsole：Java监视与管理控制台"></a>4.3.1 JConsole：Java监视与管理控制台</h5><p>​        </p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yehengchao.cn/2018/06/20/虚拟机性能监控与故障处理工具/" data-id="ck2ww8ksy000efwv76n66p8mv" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/jvm/">jvm</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/06/20/调优案例分析与实战/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          调优案例分析与实战
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/06/20/垃圾收集和内存分配/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">垃圾收集和内存分配</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Springboot/">Springboot</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/jvm/">jvm</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/内存/">内存</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Bean/">Bean</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/I-O/">I/O</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mac/">Mac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SpringAware/">SpringAware</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SpringMVC/">SpringMVC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Springboot/">Springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Windows/">Windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cookie/">cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gc/">gc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javaweb/">javaweb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jvm/">jvm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session/">session</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/socket/">socket</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内存管理/">内存管理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程/">多线程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/注解/">注解</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/策略模式/">策略模式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/观察者模式/">观察者模式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/设计模式/">设计模式</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Bean/" style="font-size: 10px;">Bean</a> <a href="/tags/I-O/" style="font-size: 10px;">I/O</a> <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/Mac/" style="font-size: 10px;">Mac</a> <a href="/tags/Spring/" style="font-size: 10px;">Spring</a> <a href="/tags/SpringAware/" style="font-size: 10px;">SpringAware</a> <a href="/tags/SpringMVC/" style="font-size: 10px;">SpringMVC</a> <a href="/tags/Springboot/" style="font-size: 10px;">Springboot</a> <a href="/tags/Windows/" style="font-size: 10px;">Windows</a> <a href="/tags/cookie/" style="font-size: 10px;">cookie</a> <a href="/tags/gc/" style="font-size: 10px;">gc</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/javaweb/" style="font-size: 10px;">javaweb</a> <a href="/tags/jvm/" style="font-size: 20px;">jvm</a> <a href="/tags/session/" style="font-size: 10px;">session</a> <a href="/tags/socket/" style="font-size: 10px;">socket</a> <a href="/tags/内存管理/" style="font-size: 10px;">内存管理</a> <a href="/tags/多线程/" style="font-size: 10px;">多线程</a> <a href="/tags/日常/" style="font-size: 10px;">日常</a> <a href="/tags/注解/" style="font-size: 10px;">注解</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a> <a href="/tags/策略模式/" style="font-size: 10px;">策略模式</a> <a href="/tags/观察者模式/" style="font-size: 10px;">观察者模式</a> <a href="/tags/设计模式/" style="font-size: 15px;">设计模式</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/08/13/Integer思考/">Java关于Integer的思考</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/12/阿里巴巴309期百年技术/">阿里巴巴309期百年技术感想</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/31/浅析通信IO/">浅析通信IO</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/02/黑苹果安装日志/">黑苹果安装</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/07/Session和Cookie/">Session和Cookie</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 Ico<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

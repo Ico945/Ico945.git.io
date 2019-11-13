@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>Spring高级话题 | 南寒</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="主要记录Spring容器中的Bean如何实现Aware接口来对事件进行发布管理，Spring容器通过一个基于线程池的任务执行器来进行异步任务的并发，条件注解的使用，组合注解声明，Enable*注解的原理以及如何进行测试。">
+<meta name="keywords" content="Springboot,SpringAware,多线程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring高级话题">
+<meta property="og:url" content="http://yehengchao.cn/2018/06/30/Spring高级话题/index.html">
+<meta property="og:site_name" content="南寒">
+<meta property="og:description" content="主要记录Spring容器中的Bean如何实现Aware接口来对事件进行发布管理，Spring容器通过一个基于线程池的任务执行器来进行异步任务的并发，条件注解的使用，组合注解声明，Enable*注解的原理以及如何进行测试。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yehengchao.cn/2018/06/30/Spring高级话题/3.7_1.png">
+<meta property="og:image" content="http://yehengchao.cn/2018/06/30/Spring高级话题/3.7_2.png">
+<meta property="og:updated_time" content="2018-07-02T01:05:55.963Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spring高级话题">
+<meta name="twitter:description" content="主要记录Spring容器中的Bean如何实现Aware接口来对事件进行发布管理，Spring容器通过一个基于线程池的任务执行器来进行异步任务的并发，条件注解的使用，组合注解声明，Enable*注解的原理以及如何进行测试。">
+<meta name="twitter:image" content="http://yehengchao.cn/2018/06/30/Spring高级话题/3.7_1.png">
+  
+    <link rel="alternate" href="/atom.xml" title="南寒" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">南寒</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">这一切都是命运石之门的选择！</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yehengchao.cn"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-Spring高级话题" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/06/30/Spring高级话题/" class="article-date">
+  <time datetime="2018-06-30T02:16:29.000Z" itemprop="datePublished">2018-06-30</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Springboot/">Springboot</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Spring高级话题
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>主要记录Spring容器中的Bean如何实现Aware接口来对事件进行发布管理，Spring容器通过一个基于线程池的任务执行器来进行异步任务的并发，条件注解的使用，组合注解声明，Enable*注解的原理以及如何进行测试。</p>
+</blockquote>
+<a id="more"></a>
+<h4 id="Spring-Aware"><a href="#Spring-Aware" class="headerlink" title="Spring Aware"></a>Spring Aware</h4><p>​    Spring的依赖注入最大亮点就是所有的Bean 对Spring 容器的存在是没有意识的。即可以将现在的容器换成别的容器，比如 Goole Guice，这时Bean之间的耦合度很低。</p>
+<p>​    但是实际项目中不可避免的用到Spring 容器本身的功能资源，这时Bean必须意识到Spring 容器的存在，才能调用Spring所提供的资源，这就是Spring Aware。使用了Spring Aware 的话Bean将会和Spring 架构之间耦合。</p>
+<p>Spring 提供的Aware接口如图所示：</p>
+<table>
+<thead>
+<tr>
+<th>接口</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BeanNameAware</td>
+<td>获得容器中Bean的名称</td>
+</tr>
+<tr>
+<td>BeanFactoryAware</td>
+<td>获得当前 bean factory，这样可以调用容器服务。</td>
+</tr>
+<tr>
+<td>ApplicationContextAware*</td>
+<td>当前 application context，这样可以调用容器服务。</td>
+</tr>
+<tr>
+<td>MessageSourceAware</td>
+<td>获得message source，这样可以获得文本信息。</td>
+</tr>
+<tr>
+<td>ApplicationEventPublisherAware</td>
+<td>应用事件发布器，可以发布事件。</td>
+</tr>
+<tr>
+<td>ResourceLoaderAware</td>
+<td>获得资源加载器，可以获得外部资源文件</td>
+</tr>
+</tbody>
+</table>
+<p>​    Spring Aware 的目的是为了让Bean获得Spring 容器的服务。因为ApplicationContext接口集成了MessageSource接口、ApplicationEventPublisher接口和ResourceLoader接口，所以Bean 只要继承ApplicationContext就可以获得Spring容器的所有服务，但原则上还是用到什么接口就实现什么接口。</p>
+<blockquote>
+<p>示例，Spring Aware演示的Bean</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> aware;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.commons.io.IOUtils;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.BeanNameAware;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.ResourceLoaderAware;</span><br><span class="line"><span class="keyword">import</span> org.springframework.core.io.Resource;</span><br><span class="line"><span class="keyword">import</span> org.springframework.core.io.ResourceLoader;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AwareService</span> <span class="keyword">implements</span> <span class="title">BeanNameAware</span>, <span class="title">ResourceLoaderAware</span> </span>&#123;   <span class="comment">//实现BeanNameAware和ResourceLoaderAware两个接口，获得Bean名称和资源加载的服务。</span></span><br><span class="line">    <span class="keyword">private</span> String beanName;</span><br><span class="line">    <span class="keyword">private</span> ResourceLoader loader;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span>   <span class="comment">//这里还有下面的注解刚开始出了点小问题，实现接口方法用@Override出现 "@Override is not allowed when implementing interface method" ,[解决办法及原因](https://stackoverflow.com/questions/15402615/override-is-not-allowed-when-implementing-interface-method)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setResourceLoader</span><span class="params">(ResourceLoader resourceLoader)</span></span>&#123;    <span class="comment">//重写setResource方法。</span></span><br><span class="line">        <span class="keyword">this</span>.loader = resourceLoader;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setBeanName</span><span class="params">(String name)</span></span>&#123;   <span class="comment">//重写setBeanName方法。</span></span><br><span class="line">        <span class="keyword">this</span>.beanName = name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">outputResult</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Bean的名称为："</span> + beanName);</span><br><span class="line">        Resource resource = loader.getResource(<span class="string">"classpath:aware/test.txt"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">"ResourceLoader加载的文件内容为："</span> + IOUtils.toString(resource.getInputStream()));</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e)&#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>配置类：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> aware;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.ComponentScan;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Configuration;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@ComponentScan</span>(<span class="string">"aware"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AwareConfig</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>运行：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> aware;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.AnnotationConfigApplicationContext;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        AnnotationConfigApplicationContext context = <span class="keyword">new</span> AnnotationConfigApplicationContext(AwareConfig.class);</span><br><span class="line"></span><br><span class="line">        AwareService awareService = context.getBean(AwareService.class);</span><br><span class="line"></span><br><span class="line">        awareService.outputResult();	</span><br><span class="line"></span><br><span class="line">        context.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">运行结果：</span><br><span class="line">Bean的名称为：awareService</span><br><span class="line">ResourceLoader加载的文件内容为：<span class="keyword">this</span> is a test file</span><br></pre></td></tr></table></figure>
+<h4 id="多线程"><a href="#多线程" class="headerlink" title="多线程"></a>多线程</h4><p>​    Spring 通过任务执行器(TaskExecutor) 来实现多线程和并发编程。使用TaskExecutorConfig 可实现一个基于线程池的TaskExecutor。实际开发中的任务一般是非阻碍的，即异步的，所以需要在配置类中使用@EnableAsync开启对异步任务的支持，并通过在实际执行的Bean方法中使用@Async注解来生命这是一个异步任务。</p>
+<blockquote>
+<p>通过一个示例来进行说明，首先写配置类：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> taskexecutor;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.ComponentScan;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Configuration;</span><br><span class="line"><span class="keyword">import</span> org.springframework.scheduling.annotation.AsyncConfigurer;</span><br><span class="line"><span class="keyword">import</span> org.springframework.scheduling.annotation.EnableAsync;</span><br><span class="line"><span class="keyword">import</span> org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.Executor;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@ComponentScan</span>(<span class="string">"taskexecutor"</span>)</span><br><span class="line"><span class="meta">@EnableAsync</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TaskExecutorConfig</span> <span class="keyword">implements</span> <span class="title">AsyncConfigurer</span> </span>&#123;    <span class="comment">//配置类实现AsyncConfigurer接口对异常线程池更加细粒度的控制，创建线程自己的线程池。</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Executor <span class="title">getAsyncExecutor</span><span class="params">()</span></span>&#123; <span class="comment">//重写getAsyncExecutor方法并返回一个ThreadPoolTaskExecutor，这样就获得了一个基于线程池TaskExecutor</span></span><br><span class="line">        ThreadPoolTaskExecutor taskExecutor = <span class="keyword">new</span> ThreadPoolTaskExecutor();</span><br><span class="line">        taskExecutor.setCorePoolSize(<span class="number">5</span>);</span><br><span class="line">        taskExecutor.setMaxPoolSize(<span class="number">10</span>);</span><br><span class="line">        taskExecutor.setQueueCapacity(<span class="number">25</span>);</span><br><span class="line">        taskExecutor.initialize();</span><br><span class="line">        <span class="keyword">return</span> taskExecutor;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> AsyncUncaughtExceptionHandler <span class="title">getAsyncUncaughtExceptionHandler</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>然后是任务执行类，就是上面所说的Bean：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> taskexecutor;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.scheduling.annotation.Async;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AsyncTaskService</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Async</span>  <span class="comment">//通过该注解表明该方法是个异步方法，如果注解在类级别上，则表明该类所有的方法都是异步方法，这里的方法自动被注入使用ThreadPoolTaskExecutor作为TaskExecutor。</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">executorAsyncTask</span><span class="params">(Integer i)</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"执行异步任务： "</span> + i);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Async</span>  <span class="comment">//同上</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">executorAsyncTaskPlus</span><span class="params">(Integer i)</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"执行异步任务+1： "</span> + (i+<span class="number">1</span>));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>运行：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> taskexecutor;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.AnnotationConfigApplicationContext;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        AnnotationConfigApplicationContext context = <span class="keyword">new</span> AnnotationConfigApplicationContext(TaskExecutorConfig.class);</span><br><span class="line"></span><br><span class="line">        AsyncTaskService asyncTaskService = context.getBean(AsyncTaskService.class);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i&lt;<span class="number">10</span>; i++)&#123;</span><br><span class="line">            asyncTaskService.executorAsyncTask(i);</span><br><span class="line">            asyncTaskService.executorAsyncTaskPlus(i);</span><br><span class="line">        &#125;</span><br><span class="line">        context.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">运行结果如下所示：</span><br><span class="line">执行异步任务+<span class="number">1</span>： <span class="number">1</span></span><br><span class="line">执行异步任务+<span class="number">1</span>： <span class="number">3</span></span><br><span class="line">执行异步任务： <span class="number">3</span></span><br><span class="line">执行异步任务+<span class="number">1</span>： <span class="number">4</span></span><br><span class="line">执行异步任务： <span class="number">4</span></span><br><span class="line">执行异步任务+<span class="number">1</span>： <span class="number">5</span></span><br><span class="line">执行异步任务： <span class="number">5</span></span><br><span class="line">执行异步任务+<span class="number">1</span>： <span class="number">6</span></span><br><span class="line">执行异步任务： <span class="number">6</span></span><br><span class="line">执行异步任务+<span class="number">1</span>： <span class="number">7</span></span><br><span class="line">执行异步任务： <span class="number">7</span></span><br><span class="line">执行异步任务+<span class="number">1</span>： <span class="number">8</span></span><br><span class="line">执行异步任务： <span class="number">8</span></span><br><span class="line">执行异步任务+<span class="number">1</span>： <span class="number">9</span></span><br><span class="line">执行异步任务： <span class="number">9</span></span><br><span class="line">执行异步任务+<span class="number">1</span>： <span class="number">10</span></span><br><span class="line">执行异步任务+<span class="number">1</span>： <span class="number">2</span></span><br><span class="line">执行异步任务： <span class="number">2</span></span><br><span class="line">执行异步任务： <span class="number">0</span></span><br><span class="line">执行异步任务： <span class="number">1</span></span><br></pre></td></tr></table></figure>
+<p>可以看出运行结果是并发执行而不是顺序执行的。</p>
+<h4 id="计划任务"><a href="#计划任务" class="headerlink" title="计划任务"></a>计划任务</h4><p>​    从Spring3.1开始，计划任务在Spring中的实现变得非常简单，首先通过在配置类添加注解@EnableScheduling 来开启对计划任务的支持，然后在要执行计划任务的方法上注解@Scheduled，声明这是一个计划任务。通过该注解Spring支持多种类型的计划任务，包含cron、fixDelay、fixRate等。</p>
+<blockquote>
+<p>首先实现计划任务实现类：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> taskscheduler;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.scheduling.annotation.Scheduled;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.text.SimpleDateFormat;</span><br><span class="line"><span class="keyword">import</span> java.util.Date;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ScheduledTaskService</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> SimpleDateFormat dateFormat = <span class="keyword">new</span> SimpleDateFormat(<span class="string">"HH:mm:ss"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Scheduled</span>(fixedRate = <span class="number">5000</span>)    <span class="comment">//通过@Scheduled声明该方法是计划任务，使用fixedRate设定每隔固定时间5秒执行一次</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">reportCurrentTime</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"每隔五秒执行一次 "</span> + dateFormat.format(<span class="keyword">new</span> Date()));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Scheduled</span>(cron = <span class="string">"0 50 19 ? * *"</span>)   <span class="comment">//使用cron属性可以按照指定的时间执行。</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">fixTimeExecution</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"在指定时间 "</span> + dateFormat.format(<span class="keyword">new</span> Date()) + <span class="string">"执行"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>然后实现配置类，主要是开启对计划任务的支持：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> taskscheduler;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.ComponentScan;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Configuration;</span><br><span class="line"><span class="keyword">import</span> org.springframework.scheduling.annotation.EnableScheduling;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@ComponentScan</span>(<span class="string">"taskscheduler"</span>)</span><br><span class="line"><span class="meta">@EnableScheduling</span>   <span class="comment">//使用此注解开启对计划任务的支持。</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TaskSchedulerConfig</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>运行类：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> taskscheduler;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.AnnotationConfigApplicationContext;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        AnnotationConfigApplicationContext context = <span class="keyword">new</span> AnnotationConfigApplicationContext(TaskSchedulerConfig.class);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">运行效果如下图所示：</span><br><span class="line">每隔五秒执行一次 <span class="number">19</span>:<span class="number">49</span>:<span class="number">46</span></span><br><span class="line">每隔五秒执行一次 <span class="number">19</span>:<span class="number">49</span>:<span class="number">51</span></span><br><span class="line">每隔五秒执行一次 <span class="number">19</span>:<span class="number">49</span>:<span class="number">56</span></span><br><span class="line">在指定时间 <span class="number">19</span>:<span class="number">50</span>:<span class="number">00</span>执行</span><br><span class="line">每隔五秒执行一次 <span class="number">19</span>:<span class="number">50</span>:<span class="number">01</span></span><br><span class="line">每隔五秒执行一次 <span class="number">19</span>:<span class="number">50</span>:<span class="number">06</span></span><br></pre></td></tr></table></figure>
+<h4 id="条件注解-Conditional"><a href="#条件注解-Conditional" class="headerlink" title="条件注解@Conditional"></a>条件注解@Conditional</h4><p>​    Spring 4提供了一个基于条件的Bean的创建，即使用@Conditional注解，该注解根据满足某一个特定条件创建一个特定的Bean。如当一个jar包在一个类路径下的时候，自动配置一个或多个Bean；或者只有某个Bean被创建才会创建另外一个Bean。</p>
+<p>​    下面演示一个以不同操作系统为条件，通过实现Condition接口，并重写matches方法来构造判断条件。</p>
+<blockquote>
+<p>首先实现Windows条件的判定：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> conditional;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Condition;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.ConditionContext;</span><br><span class="line"><span class="keyword">import</span> org.springframework.core.type.AnnotatedTypeMetadata;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WindowsCondition</span> <span class="keyword">implements</span> <span class="title">Condition</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">matches</span><span class="params">(ConditionContext context, AnnotatedTypeMetadata metadata)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> context.getEnvironment().getProperty(<span class="string">"os.name"</span>).contains(<span class="string">"Windows"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Linux条件判定：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> conditional;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Condition;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.ConditionContext;</span><br><span class="line"><span class="keyword">import</span> org.springframework.core.type.AnnotatedTypeMetadata;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LinuxCondition</span> <span class="keyword">implements</span> <span class="title">Condition</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">matches</span><span class="params">(ConditionContext context, AnnotatedTypeMetadata metadata)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> context.getEnvironment().getProperty(<span class="string">"os.name"</span>).contains(<span class="string">"Linux"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>定义Service接口：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> conditional;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ListService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">showList</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Windows下要创建的Bean：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> conditional;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WindowsListService</span> <span class="keyword">implements</span> <span class="title">ListService</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">showList</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"dir"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">package</span> conditional;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Linux下要创建的Bean：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> conditional;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LinuxListService</span> <span class="keyword">implements</span> <span class="title">ListService</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">showList</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"ls"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>配置类：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> conditional;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Bean;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Conditional;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Configuration;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConditionConfig</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="meta">@Conditional</span>(WindowsCondition.class)    <span class="comment">//通过@Conditional注解，符合Windows条件则实例化WindowsListService。</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ListService <span class="title">WindowsListService</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> WindowsListService();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="meta">@Conditional</span>(LinuxCondition.class)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ListService <span class="title">LinuxListService</span><span class="params">()</span></span>&#123;  <span class="comment">//同上，实例化LinuxListService。</span></span><br><span class="line">        <span class="keyword">return</span> LinuxListService();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>运行类：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> conditional;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.AnnotationConfigApplicationContext;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        AnnotationConfigApplicationContext context = <span class="keyword">new</span> AnnotationConfigApplicationContext(ConditionConfig.class);</span><br><span class="line"></span><br><span class="line">        ListService listService = context.getBean(ListService.class);</span><br><span class="line"></span><br><span class="line">        System.out.println(context.getEnvironment().getProperty(<span class="string">"os.name"</span>) + <span class="string">"系统下的列表命令为："</span> + listService.showList());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">在Windows下的运行结果：</span><br><span class="line">Windows <span class="number">10</span>系统下的列表命令为：dir</span><br><span class="line"></span><br><span class="line">打包为jar包，Linux下的运行结果：</span><br><span class="line">INFO: Refreshing org.springframework.context.annotation.AnnotationConfigApplicationContext@<span class="number">7</span>cd84586: startup date [Sun Jul <span class="number">01</span> <span class="number">21</span>:<span class="number">06</span>:<span class="number">31</span> CST <span class="number">2018</span>]; root of context hierarchy</span><br><span class="line">Linux系统下的列表命令为：ls</span><br></pre></td></tr></table></figure>
+<h4 id="组合注解与元注解"><a href="#组合注解与元注解" class="headerlink" title="组合注解与元注解"></a>组合注解与元注解</h4><p>​    从Spring 2开始，为了响应jdk 1.5推出的注解功能，Spring开始大量加入注解来代替xml配置。之前所涉及到的基本上都是元注解，元注解其实就是可以注解到别的注解上的注解，被注解的注解则称为组合注解，组合注解具备注解其上的元注解的功能。下面通过一个自定义的注解实现将@Configuration和@ComponentScan两个注解的组合。</p>
+<blockquote>
+<p>首先实现示例组合注解：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> annotation;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.ComponentScan;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Configuration;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.lang.annotation.*;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Target</span>(ElementType.TYPE)</span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="meta">@Documented</span></span><br><span class="line"><span class="meta">@Configuration</span>  <span class="comment">//组合@Configuration元注解</span></span><br><span class="line"><span class="meta">@ComponentScan</span>  <span class="comment">//组合@ComponentScan元注解</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> WiselyConfigration &#123;</span><br><span class="line">    String[] value() <span class="keyword">default</span> &#123;&#125;;    <span class="comment">//覆盖value参数。</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>演示服务Bean：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> annotation;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DemoService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">outputResult</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"从组合注解获得bean"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>加上组合注解的配置类：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> annotation;</span><br><span class="line"><span class="meta">@WiselyConfigration</span>(<span class="string">"annotation"</span>)   <span class="comment">//使用自定义的组合注解，代替@Configuration和@ComponentScan。</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DemoConfig</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>运行：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> annotation;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.AnnotationConfigApplicationContext;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        AnnotationConfigApplicationContext context = <span class="keyword">new</span> AnnotationConfigApplicationContext(DemoConfig.class);</span><br><span class="line"></span><br><span class="line">        DemoService demoService = context.getBean(DemoService.class);</span><br><span class="line"></span><br><span class="line">        demoService.outputResult();</span><br><span class="line"></span><br><span class="line">        context.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">运行结果如下：</span><br><span class="line">从组合注解获得bean</span><br></pre></td></tr></table></figure>
+<h4 id="Enable-注解的工作原理"><a href="#Enable-注解的工作原理" class="headerlink" title="@Enable*注解的工作原理"></a>@Enable*注解的工作原理</h4><p>​    所有的@Enable*注解中都有一个@Import注解，是用来导入配置类的。具体说明可以看<a href="https://www.jianshu.com/p/3da069bd865c" target="_blank" rel="noopener">这里</a>。</p>
+<h4 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h4><p>​    Spring 通过Spring TestContext Framework对集成测试提供顶级支持，它不依赖特定的测试框架，既可使用Junit、也可使用TestNG。</p>
+<p>​    基于Maven构建的项目结构默认有关于测试的目录：src/test/java(测试代码)、src/test/resources(测试资源)，区别于src/main/java(项目源码)、src/main/resources(项目资源)。</p>
+<p>​    Spring提供了一个SpringJUnit4ClassRunner类，接下来对该类提供的部分功能进行演示。</p>
+<blockquote>
+<p>首先添加Spring测试的依赖包到Maven：</p>
+</blockquote>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 单元测试 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>junit<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>junit<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">version</span>&gt;</span>4.11<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- 4)Spring test --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-test<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">version</span>&gt;</span>4.1.7.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>业务代码，在 src/main/java目录下：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> fortest;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestBean</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String content;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">TestBean</span><span class="params">(String content)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.content = content;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getContent</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> content;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setContent</span><span class="params">(String content)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.content = content;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>配置类，在 src/main/java目录下：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> fortest;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Bean;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Configuration;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Profile;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestConfig</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="meta">@Profile</span>(<span class="string">"dev"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> TestBean <span class="title">devTestBean</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> TestBean(<span class="string">"from development profile"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="meta">@Profile</span>(<span class="string">"prod"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> TestBean <span class="title">prodTestBean</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> TestBean(<span class="string">"from production profile"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>测试类，在src/test/java目录下：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> fortest;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.junit.Assert;</span><br><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"><span class="keyword">import</span> org.junit.runner.RunWith;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line"><span class="keyword">import</span> org.springframework.test.context.ActiveProfiles;</span><br><span class="line"><span class="keyword">import</span> org.springframework.test.context.ContextConfiguration;</span><br><span class="line"><span class="keyword">import</span> org.springframework.test.context.junit4.SpringJUnit4ClassRunner;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RunWith</span>(SpringJUnit4ClassRunner.class) <span class="comment">//SpringJUnit4ClassRunner在JUnit环境下提供Spring TestContext Framework的功能。</span></span><br><span class="line"><span class="meta">@ContextConfiguration</span>(classes = &#123;TestConfig.class&#125;) <span class="comment">//加载配置</span></span><br><span class="line"><span class="meta">@ActiveProfiles</span>(<span class="string">"prod"</span>) <span class="comment">//声明活动的profile</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DemoBeanIntegrationTests</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Autowired</span>  <span class="comment">//使用@Autowired注解注入Bean。</span></span><br><span class="line">    <span class="keyword">private</span> TestBean testBean;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span>   <span class="comment">//测试代码，使用JUnit的Assert来校验结果是否和预期一样</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">proBeanShouldInject</span><span class="params">()</span></span>&#123;</span><br><span class="line">        String expected = <span class="string">"from production profile"</span>;</span><br><span class="line">        String actual = testBean.getContent();</span><br><span class="line">        Assert.assertEquals(expected, actual);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试效果如下图所示：</p>
+<p><img src="3.7_1.png" alt="Alt text"></p>
+<p>接下来将@ActiveProfiles(“prod”)改为@ActiveProfiles(“dev”)，效果如下所示：</p>
+<p><img src="3.7_2.png" alt="Alt text"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yehengchao.cn/2018/06/30/Spring高级话题/" data-id="ck2ww8kue002afwv7r9khcmpr" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SpringAware/">SpringAware</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Springboot/">Springboot</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/多线程/">多线程</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/07/03/SpringMVC基础/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          SpringMVC基础
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/06/26/Spring常用配置/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Spring常用配置</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Springboot/">Springboot</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/jvm/">jvm</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/内存/">内存</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Bean/">Bean</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/I-O/">I/O</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mac/">Mac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SpringAware/">SpringAware</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SpringMVC/">SpringMVC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Springboot/">Springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Windows/">Windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cookie/">cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gc/">gc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javaweb/">javaweb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jvm/">jvm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session/">session</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/socket/">socket</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内存管理/">内存管理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程/">多线程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/日常/">日常</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/注解/">注解</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/策略模式/">策略模式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/观察者模式/">观察者模式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/设计模式/">设计模式</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Bean/" style="font-size: 10px;">Bean</a> <a href="/tags/I-O/" style="font-size: 10px;">I/O</a> <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/Mac/" style="font-size: 10px;">Mac</a> <a href="/tags/Spring/" style="font-size: 10px;">Spring</a> <a href="/tags/SpringAware/" style="font-size: 10px;">SpringAware</a> <a href="/tags/SpringMVC/" style="font-size: 10px;">SpringMVC</a> <a href="/tags/Springboot/" style="font-size: 10px;">Springboot</a> <a href="/tags/Windows/" style="font-size: 10px;">Windows</a> <a href="/tags/cookie/" style="font-size: 10px;">cookie</a> <a href="/tags/gc/" style="font-size: 10px;">gc</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/javaweb/" style="font-size: 10px;">javaweb</a> <a href="/tags/jvm/" style="font-size: 20px;">jvm</a> <a href="/tags/session/" style="font-size: 10px;">session</a> <a href="/tags/socket/" style="font-size: 10px;">socket</a> <a href="/tags/内存管理/" style="font-size: 10px;">内存管理</a> <a href="/tags/多线程/" style="font-size: 10px;">多线程</a> <a href="/tags/日常/" style="font-size: 10px;">日常</a> <a href="/tags/注解/" style="font-size: 10px;">注解</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a> <a href="/tags/策略模式/" style="font-size: 10px;">策略模式</a> <a href="/tags/观察者模式/" style="font-size: 10px;">观察者模式</a> <a href="/tags/设计模式/" style="font-size: 15px;">设计模式</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/08/13/Integer思考/">Java关于Integer的思考</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/12/阿里巴巴309期百年技术/">阿里巴巴309期百年技术感想</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/31/浅析通信IO/">浅析通信IO</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/02/黑苹果安装日志/">黑苹果安装</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/07/Session和Cookie/">Session和Cookie</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 Ico<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
