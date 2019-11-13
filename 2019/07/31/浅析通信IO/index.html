@@ -1,0 +1,81 @@
+<!DOCTYPE html><html lang="zh-Hans"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content=""><title>浅析通信IO | 南寒</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/normalize/8.0.1/normalize.min.css"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/pure/1.0.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/pure/1.0.0/grids-responsive-min.css"><link rel="stylesheet" href="//lib.baomitu.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//lib.baomitu.com/jquery/3.4.0/jquery.min.js"></script><link rel="icon" mask="" sizes="any" href="/favicon.ico"><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"><link rel="alternate" type="application/atom+xml" href="/atom.xml"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">浅析通信IO</h1><a id="logo" href="/.">南寒</a><p class="description">喜欢就买，不行就分。多喝热水，重启试试。</p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> Start</i></a><a href="/archives/"><i class="fa fa-archive"> Archiv</i></a><a href="/about/"><i class="fa fa-user"> Über</i></a><a href="/atom.xml"><i class="fa fa-rss"> RSS</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">浅析通信IO</h1><div class="post-meta">Jul 31, 2019<span> | </span><span class="category"><a href="/categories/web/">web</a></span></div><div class="post-content"><p>记一次IO相关的技术分享</p>
+<a id="more"></a>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>虽然在大厂实习总时间也一个多月了，但是因为特殊缘故一周只能过去两天，所以在公司的时间并不多。部门主管也表示理解，师兄也并不布置什么重大任务，现阶段还是以学习为主。作为中间件大厂，就我们部门而言一个项目里的中间件是极多的，即使是一个增删改查项目也少不了主干配置、switch等中间件。所以之前也着重在学习常用中间件的使用比如metaQ、SchedulerX。这不我们部门还有一个传统就是每个人要周期性地进行技术分享。这可真是难为我了，想了好几天最后决定讲讲IO吧，并没有什么技术上的创新。</p>
+<h2 id="理解IO"><a href="#理解IO" class="headerlink" title="理解IO"></a>理解IO</h2><p>首先，I/O顾名思义就是输入输出的意思（input/output）。主要以文件流的形式从某个模块复制/移动到另一个模块，通常指边缘设备、各种存储和内存空间。常见的I/O场景有磁盘I/O、网络I/O、数据库I/O等。</p>
+<p><img src="http://image.yehengchao.cn/superbed/2019/07/30/5d3fed0c451253d178e09ec8.jpg" alt=""></p>
+<p>如上图以网络I/O为例，客户端对服务端连接请求过程中会有相应的数据传输，数据通过网络首先到达的就是服务端的网卡。所以整个I/O过程可以简单地认为是网卡上的数据到用户空间这个转移过程，最终目的就是要让我们写的程序（用户进程）能够得到数据。</p>
+<p>像网卡这类计算机硬件我们的用户进程是无法直接对它操作的，比如微信视频聊天的时候需要你的电脑打开摄像头，这个过程中微信并不能直接去操作摄像头，他需要调用操作系统（内核进程），然后内核态的进程才能发出指令，操控摄像头。同理，这里网卡上的数据先要copy到系统内核空间，然后再从内核空间copy到用户空间。</p>
+<p>网上找的例子：</p>
+<table>
+<thead>
+<tr>
+<th>I/O过程</th>
+<th>用户空间</th>
+<th>网卡</th>
+<th>数据</th>
+<th>内核空间</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>钓鱼</td>
+<td>鱼篓</td>
+<td>池塘</td>
+<td>鱼</td>
+<td>鱼竿/鱼钩</td>
+</tr>
+</tbody>
+</table>
+<p>一次I/O的目的始终是将数据移动到用户空间里，至于应用进程如何操作数据已经和I/O无关了（钓鱼的最终目的就是把鱼放到鱼篓里，至于后面鱼怎么烧那是后面的事情了，心情好想生吃都行:-) ）。</p>
+<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p><img src="http://image.yehengchao.cn/superbed/2019/07/30/5d3fed0c451253d178e09eca.jpg" alt=""></p>
+<p>首先讲阻塞/非阻塞、同步/异步。我一直觉得I/O中的这几个概念并没有一个很明确的定义，主要是NIO 大多数说法它是一个同步非阻塞I/O，然后转眼你又看到其他人说它是异步I/O。最主要的原因是对I/O分类不一样。</p>
+<p>首先根据上述的I/O过程，将其分为两个阶段：</p>
+<ol>
+<li>数据准备阶段：网卡将数据copy到内核空间的过程。</li>
+<li>数据I/O阶段：用户进程真正执行数据I/O。</li>
+</ol>
+<p>用户进程首先发起I/O，数据如果未就绪内核进程就会开始网卡到内核空间的数据拷贝过程，此时用户空间是一直等着还是不等去做别的事情，将这一步用来区分I/O是否阻塞的。然后数据准备就绪之后需要拷贝到用户空间，此时用户进程也就是发起I/O请求的用户进程是否需要执行拷贝任务，将这一步用来区分I/O是同步还是异步的。</p>
+<p>所以在这个定义下，NIO就是同步非阻塞I/O了，如果你要说第一步没有阻塞，数据准备过程中用户进程可以同时去做别的事情，明明就是异步的。那他就是异步I/O :-)。只要能理解就行。</p>
+<h2 id="内容"><a href="#内容" class="headerlink" title="内容"></a>内容</h2><h3 id="BIO"><a href="#BIO" class="headerlink" title="BIO"></a>BIO</h3><blockquote>
+<p>钓鱼的时候，我们坐在鱼竿前面手拿着鱼竿，等待的过程中什么也不做，直到鱼上钩了我们就把鱼钓起来，放到鱼篓里。然后接着钓鱼。</p>
+</blockquote>
+<p>上面这个例子中对于我们这个人来说，钓鱼过程中我们什么也干不了（是被阻塞的）。硬是得等鱼来了我们才开始干活，对于我们来说效率是很低的。</p>
+<p><img src="http://image.yehengchao.cn/superbed/2019/07/30/5d3fed0c451253d178e09ece.jpg" alt=""></p>
+<p>如上图，对于发起I/O操作的用户进程来看它主要经历的时间分为：等待数据就绪和复制数据这两步，第一步的时候用户进程并没有干什么活，只是眼巴巴地等着，相当于它占着CPU又不用，拉低了CPU的执行效率。</p>
+<h3 id="NIO"><a href="#NIO" class="headerlink" title="NIO"></a>NIO</h3><blockquote>
+<p>钓鱼的时候，我们坐在鱼竿前面 由于等待的过程很久，我们一边等一边玩手机，玩着玩着再抬头看看鱼来了没有… 等鱼来了我们再把鱼钓起来放到鱼篓里面。</p>
+</blockquote>
+<p>上面就相当于改良版的钓鱼方式了，我们在等的过程中还可以玩玩手机（当然玩其它东西也行:-)），但是需要时不时看一眼鱼来了没有，对于我来说效率确实是高了。</p>
+<p><img src="http://image.yehengchao.cn/superbed/2019/07/30/5d3fed0c451253d178e09ed2.jpg" alt=""></p>
+<p>如上图，对于发起I/O操作的进程来看它经历的时间也还是等待数据和复制数据，但是它在等待时如果发现数据未就绪会让出CPU，待会再过来看看（来来来老哥，我现在还不急要不你先上，我待会再来看看我急不急-:)）。</p>
+<h3 id="多路复用"><a href="#多路复用" class="headerlink" title="多路复用"></a>多路复用</h3><blockquote>
+<p>还是钓鱼，发现我一个人钓还是太慢了，池塘这边 那边都有好多鱼，要不在叫几个人过来和我一起钓？不行，鱼多的地方实在太多了我朋友平时都很忙的，不能麻烦他们！对了，我可以多带点鱼竿，每个地方都放一根，然后我看着哪个地方的鱼竿鱼来了，我再过去收就行了。</p>
+</blockquote>
+<p>我开始变得贪心了，又想同时钓很多鱼又不想叫人，那我不得累点吗 不过还好钓鱼这个活大部分时间都是在等。这样一来我同时能钓上来的鱼肯定更多了。</p>
+<p><img src="http://image.yehengchao.cn/superbed/2019/07/30/5d3fed0c451253d178e09ed5.jpg" alt=""></p>
+<p>其实这就是IO多路复用模型，如上图所示 未复用的情况下，每个连接都会启用一个线程来处理请求，如果是高并发的情况下内存会不够用。因此让多个连接复用一个线程，并且通过一个Selector选择器通知线程IO就绪的任务。流程图如下图所示，可见多路复用下连接是阻塞在Selector上并不是阻塞在系统IO任务上，因此CPU并不阻塞，文件描述符（fd）的切换只是相当于for循环一样的消耗。</p>
+<p>总结三种模型：</p>
+<p><img src="http://image.yehengchao.cn/superbed/2019/07/30/5d3fed5f451253d178e0a160.jpg" alt=""></p>
+<p><img src="http://image.yehengchao.cn/superbed/2019/07/30/5d3fed5f451253d178e0a162.jpg" alt=""></p>
+<p><img src="http://image.yehengchao.cn/superbed/2019/07/30/5d3fed5f451253d178e0a166.jpg" alt=""></p>
+<h3 id="AIO"><a href="#AIO" class="headerlink" title="AIO"></a>AIO</h3><p>上文中也有提到I/O过程分为两个阶段，上述的模型不同的只是第一个阶段（数据准备过程），第二阶段（数据IO过程）都是同步的，也就是都需要发起IO的用户进程去将内核态已经准备好的数据拷贝到用户态。AIO则是异步IO，即内核态的数据准备就绪之后内核线程并不会提交信号，内核线程会将准备好的数据copy到用户空间（同步IO里这一步是用户线程做的事情）。当copy完成之后再向用户进程提交信号，用户进程收到信号之后就能操作数据了。</p>
+<p><img src="http://image.yehengchao.cn/superbed/2019/07/30/5d3fed5f451253d178e0a16a.jpg" alt=""></p>
+<p>大概流程如上图所示，可见异步IO在两个阶段都不会发生阻塞，对用户进程而言它只要发出I/O操作就立即返回，等他接受就绪信号的时候已经可以直接操作数据了。</p>
+<p>可以按照下图进行分类：</p>
+<p><img src="http://image.yehengchao.cn/superbed/2019/07/30/5d3fed5f451253d178e0a16d.jpg" alt=""></p>
+<h2 id="实验比较"><a href="#实验比较" class="headerlink" title="实验比较"></a>实验比较</h2><p>因为Java中 AIO 的使用并不多，所以我们比较BIO和NIO的延迟时间，分别打开tomcat的两种模式，然后使用压测工具JMeter模拟1000次首页的访问。</p>
+<p>各个配置如下图所示，tomcat开启各种模式成功与否可以通过日志验证：</p>
+<p><img src="http://image.yehengchao.cn/superbed/2019/07/30/5d3fed96451253d178e0a354.jpg" alt=""></p>
+<p><img src="http://image.yehengchao.cn/superbed/2019/07/30/5d3fed96451253d178e0a357.png" alt=""></p>
+<p><img src="http://image.yehengchao.cn/superbed/2019/07/30/5d3fed96451253d178e0a35b.png" alt=""></p>
+<p><img src="http://image.yehengchao.cn/superbed/2019/07/30/5d3fed96451253d178e0a35f.png" alt=""></p>
+<p><img src="http://image.yehengchao.cn/superbed/2019/07/30/5d3fed96451253d178e0a363.png" alt=""></p>
+<h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2><p>Netty：在Java NIO的基础上进行封装（RocketMQ、Dubbo通信层都使用了netty）。</p>
+<p>组成如下图：</p>
+<p><img src="http://image.yehengchao.cn/superbed/2019/07/30/5d3fedba451253d178e0a497.jpg" alt=""></p>
+<p><img src="http://image.yehengchao.cn/superbed/2019/07/30/5d3fedba451253d178e0a49e.jpg" alt=""></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>BIO：同步阻塞I/O，I/O过程中的两个阶段都会发生阻塞。</p>
+<p>NIO：同步非阻塞I/O，I/O的第一个阶段（数据准备阶段）不会阻塞，第二阶段（数据拷贝）需要用户进程主动拷贝，会发生阻塞。</p>
+<p>多路复用IO：和NIO一样，同步非阻塞。在NIO的基础上多连接复用一个线程。</p>
+<p>AIO：两个阶段都不阻塞，异步IO。</p>
+</div><div class="tags"><a href="/tags/socket/">socket</a><a href="/tags/I-O/">I/O</a></div><div class="post-nav"><a class="pre" href="/2019/08/12/阿里巴巴309期百年技术/">阿里巴巴309期百年技术感想</a><a class="next" href="/2018/12/02/黑苹果安装日志/">黑苹果安装</a></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><form class="search-form" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank"><input type="text" name="q" maxlength="20" placeholder="Search"/><input type="hidden" name="sitesearch" value="http://yehengchao.cn"/></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> Kategorien</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Springboot/">Springboot</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/jvm/">jvm</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/内存/">内存</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> Tags</i></div><div class="tagcloud"><a href="/tags/Mac/" style="font-size: 15px;">Mac</a> <a href="/tags/java/" style="font-size: 15px;">java</a> <a href="/tags/javaweb/" style="font-size: 15px;">javaweb</a> <a href="/tags/session/" style="font-size: 15px;">session</a> <a href="/tags/cookie/" style="font-size: 15px;">cookie</a> <a href="/tags/Windows/" style="font-size: 15px;">Windows</a> <a href="/tags/内存管理/" style="font-size: 15px;">内存管理</a> <a href="/tags/设计模式/" style="font-size: 15px;">设计模式</a> <a href="/tags/策略模式/" style="font-size: 15px;">策略模式</a> <a href="/tags/jvm/" style="font-size: 15px;">jvm</a> <a href="/tags/日常/" style="font-size: 15px;">日常</a> <a href="/tags/生活/" style="font-size: 15px;">生活</a> <a href="/tags/JVM/" style="font-size: 15px;">JVM</a> <a href="/tags/SpringMVC/" style="font-size: 15px;">SpringMVC</a> <a href="/tags/注解/" style="font-size: 15px;">注解</a> <a href="/tags/gc/" style="font-size: 15px;">gc</a> <a href="/tags/socket/" style="font-size: 15px;">socket</a> <a href="/tags/I-O/" style="font-size: 15px;">I/O</a> <a href="/tags/观察者模式/" style="font-size: 15px;">观察者模式</a> <a href="/tags/Bean/" style="font-size: 15px;">Bean</a> <a href="/tags/Spring/" style="font-size: 15px;">Spring</a> <a href="/tags/Springboot/" style="font-size: 15px;">Springboot</a> <a href="/tags/SpringAware/" style="font-size: 15px;">SpringAware</a> <a href="/tags/多线程/" style="font-size: 15px;">多线程</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> Letzte</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2019/08/13/Integer思考/">Java关于Integer的思考</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/08/12/阿里巴巴309期百年技术/">阿里巴巴309期百年技术感想</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/31/浅析通信IO/">浅析通信IO</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/02/黑苹果安装日志/">黑苹果安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/07/Session和Cookie/">Session和Cookie</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/01/浅谈观察者模式/">浅谈观察者模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/25/浅谈策略模式/">浅谈策略模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/03/SpringMVC基础/">SpringMVC基础</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/30/Spring高级话题/">Spring高级话题</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/26/Spring常用配置/">Spring常用配置</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> Blogroll</i></div><ul></ul><a href="http://www.example1.com/" title="site-name1" target="_blank">site-name1</a><ul></ul><a href="http://www.example2.com/" title="site-name2" target="_blank">site-name2</a><ul></ul><a href="http://www.example3.com/" title="site-name3" target="_blank">site-name3</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2019 <a href="/." rel="nofollow">南寒.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>

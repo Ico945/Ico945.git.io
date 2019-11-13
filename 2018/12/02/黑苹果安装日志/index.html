@@ -1,0 +1,64 @@
+<!DOCTYPE html><html lang="zh-Hans"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content=""><title>黑苹果安装 | 南寒</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/normalize/8.0.1/normalize.min.css"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/pure/1.0.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/pure/1.0.0/grids-responsive-min.css"><link rel="stylesheet" href="//lib.baomitu.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//lib.baomitu.com/jquery/3.4.0/jquery.min.js"></script><link rel="icon" mask="" sizes="any" href="/favicon.ico"><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"><link rel="alternate" type="application/atom+xml" href="/atom.xml"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">黑苹果安装</h1><a id="logo" href="/.">南寒</a><p class="description">喜欢就买，不行就分。多喝热水，重启试试。</p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> Start</i></a><a href="/archives/"><i class="fa fa-archive"> Archiv</i></a><a href="/about/"><i class="fa fa-user"> Über</i></a><a href="/atom.xml"><i class="fa fa-rss"> RSS</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">黑苹果安装</h1><div class="post-meta">Dec 2, 2018</div><div class="post-content"><blockquote>
+<p>记录黑苹果安装。</p>
+</blockquote>
+<a id="more"></a>
+<h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>第一次安装黑苹果，中间踩了不少坑，从刚开始一无所知的小白到现在的完美安装，觉得有必要做一个记录。也为以后再装的时候做一个参考吧。废话不多说，先上效果图</p>
+<p><img src="http://image.yehengchao.cn/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202018-12-02%2016.44.33.png" alt="屏幕快照 2018-12-02 16.44.33.png"></p>
+<h4 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h4><p>先说一下我的配置情况：</p>
+<ul>
+<li>主板：微星（MSI）Z370 TOMAHAWK战斧导弹</li>
+<li>CPU：Intel 8086k（8700k特挑版）</li>
+<li>内存：威刚万紫千红 ddr4 2666 8g + 英睿达 ddr4 2400 8g</li>
+<li>显卡：蓝宝石 rx560d 4g （6pin供电）</li>
+<li>硬盘：阿斯加特 256g(nvme) + hp sata 128g</li>
+<li>板载声卡：ALC892</li>
+</ul>
+<p>主要配置就是这些，其他的和装黑苹果关系不大就省略了。</p>
+<p><img src="http://image.yehengchao.cn/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202018-12-02%2016.57.35.png" alt=""></p>
+<h4 id="安装思路"><a href="#安装思路" class="headerlink" title="安装思路"></a>安装思路</h4><p>配置是我当时随便买的，也没想到突然想装黑苹果，当时的显卡是 750ti ，因为新系统mojave（10.14）并没有N卡的驱动，所以一顿搜索闲鱼上淘了一个 amd 560矿卡，考虑到amd免驱不得不AMD YES了。</p>
+<p>首先设置一下BIOS里的设置，这里参考<a href="https://www.tonymacx86.com/threads/unibeast-install-macos-mojave-on-any-supported-intel-based-pc.259381/" target="_blank" rel="noopener">tonymac</a>。由于我是MSI的主板设置界面会有所不同，根据链接给的方法设置即可：<img src="http://image.yehengchao.cn/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202018-12-02%2017.07.34.png" alt=""></p>
+<p>设置如下：</p>
+<p>首选显示设备——PEG（有独显设置）</p>
+<p>共享内存——64M（看主板型号，我最大就是64）</p>
+<p>MSI快速启动——禁止</p>
+<p>快速启动——禁止</p>
+<h4 id="CLOVER配置"><a href="#CLOVER配置" class="headerlink" title="CLOVER配置"></a>CLOVER配置</h4><p>这里需要用到几个工具，先介绍一下，由于我当时是在windows里装的，所以这里的工具针对win，当然mac下也有对应的工具 一搜就有了。</p>
+<blockquote>
+<p>Etcher-Setup-1.4.6-x64 ：用作将mac系统写入U盘中，制作安装盘使用</p>
+<p>下载：链接:<a href="https://pan.baidu.com/s/1rcV1rod6hjiW3LAMxD8FZg" target="_blank" rel="noopener">https://pan.baidu.com/s/1rcV1rod6hjiW3LAMxD8FZg</a>  密码:l4fc</p>
+</blockquote>
+<blockquote>
+<p>EasyUEFI_Free ：用作装好以后调整启动EFI顺序，可能用得到</p>
+<p>链接:<a href="https://pan.baidu.com/s/1rcV1rod6hjiW3LAMxD8FZg" target="_blank" rel="noopener">https://pan.baidu.com/s/1rcV1rod6hjiW3LAMxD8FZg</a>  密码:l4fc</p>
+</blockquote>
+<p>系统镜像文件用的是远景上黑果小兵的<a href="https://mirrors.dtops.cc/iso/MacOS/daliansky_macos/" target="_blank" rel="noopener">链接</a>，我下的是macOS Mojave 10.14(18A389) Installer with Clover 4670.dmg。镜像是带Clover的，其中带了很多配置文件和驱动，需要根据自己的情况删减。</p>
+<p>我使用的驱动：<img src="http://image.yehengchao.cn/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202018-12-02%2020.58.05.png" alt=""></p>
+<p>如果和我的配置一样，可以直接使用我的clover</p>
+<blockquote>
+<p>链接:<a href="https://pan.baidu.com/s/1xjfkhFCwodesDCYAY8PvQw" target="_blank" rel="noopener">https://pan.baidu.com/s/1xjfkhFCwodesDCYAY8PvQw</a>  密码:awob</p>
+</blockquote>
+<p>这里有两点要说明一下：</p>
+<ul>
+<li><p>AppleAlc 这个驱动是网上找的我这个声卡的驱动（892），对应的需要自己下，config中注入ID为1。</p>
+</li>
+<li><p>CodecCommander 和EAPDFix 这两个驱动刚开始我是没有的，导致了一个问题就是每次开机声卡是正常的，睡眠之后声音就会很小。网上搜了一大堆说的是macos唤醒之后声卡没有驱动，解决的办法是：</p>
+<p>sudo kextunload /System/Library/Extensions/AppleHDA.kext<br>sudo kextload /System/Library/Extensions/AppleHDA.kext</p>
+<p>重新加载声卡，可以写成脚本每次睡眠都运行一下（我觉得太呆了）。所以用了第二个办法，加入这个驱动。不知道原理是什么。</p>
+<p>链接:<a href="https://pan.baidu.com/s/1I7rqzLFplJlxI2UJE_naZw" target="_blank" rel="noopener">https://pan.baidu.com/s/1I7rqzLFplJlxI2UJE_naZw</a>  密码:kary</p>
+<p>链接:<a href="https://pan.baidu.com/s/1ooSgZ5I91zkcWwQQbAELSg" target="_blank" rel="noopener">https://pan.baidu.com/s/1ooSgZ5I91zkcWwQQbAELSg</a>  密码:t368</p>
+</li>
+</ul>
+<p>还有一点，机型的设置尽量针对显卡，因为我的是rx560，所以这里选择18,2。</p>
+<p><img src="http://image.yehengchao.cn/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202018-12-02%2017.35.35.png" alt=""></p>
+<h4 id="系统设置"><a href="#系统设置" class="headerlink" title="系统设置"></a>系统设置</h4><p>因为我的是2k屏，并不能很好的支持苹果的视网膜屏，所以要开启Hidpi，但是还是推荐使用4k屏。</p>
+<p><a href="https://github.com/xzhih/one-key-hidpi" target="_blank" rel="noopener">一键开启Hidpi</a></p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>其他就没什么好说的了，对应什么问题搜索解决即可。</p>
+<p>上一波成果图：</p>
+<p><img src="http://image.yehengchao.cn/61544087673_.pic_hd.jpg" alt=""></p>
+<p><img src="http://image.yehengchao.cn/51544087661_.pic_hd.jpg" alt=""></p>
+<h4 id="后续"><a href="#后续" class="headerlink" title="后续"></a>后续</h4><p>之前装好的黑苹果用了一段时间有一个问题。那就是在浏览网页的时候字体发虚，mac系统还是得上4k屏才完美。所以不得不将这个2k屏挂了闲鱼，后来福利价出了师弟。。</p>
+<p>刚好双十二，京东逛了一圈看中一款飞利浦的4k屏，型号是276E，双十二好价果断入手，用了以后发现打开新世界的大门。之前觉得24寸屏幕刚好，现在反而觉得27寸才是王道啊～</p>
+<p>上两张图：</p>
+<p><img src="http://image.yehengchao.cn/mac1.jpg" alt=""></p>
+<p><img src="http://image.yehengchao.cn/mac2.jpg" alt=""></p>
+</div><div class="tags"><a href="/tags/Mac/">Mac</a></div><div class="post-nav"><a class="pre" href="/2019/07/31/浅析通信IO/">浅析通信IO</a><a class="next" href="/2018/08/07/Session和Cookie/">Session和Cookie</a></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><form class="search-form" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank"><input type="text" name="q" maxlength="20" placeholder="Search"/><input type="hidden" name="sitesearch" value="http://yehengchao.cn"/></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> Kategorien</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Springboot/">Springboot</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/jvm/">jvm</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/内存/">内存</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> Tags</i></div><div class="tagcloud"><a href="/tags/Mac/" style="font-size: 15px;">Mac</a> <a href="/tags/java/" style="font-size: 15px;">java</a> <a href="/tags/javaweb/" style="font-size: 15px;">javaweb</a> <a href="/tags/session/" style="font-size: 15px;">session</a> <a href="/tags/cookie/" style="font-size: 15px;">cookie</a> <a href="/tags/Windows/" style="font-size: 15px;">Windows</a> <a href="/tags/内存管理/" style="font-size: 15px;">内存管理</a> <a href="/tags/设计模式/" style="font-size: 15px;">设计模式</a> <a href="/tags/策略模式/" style="font-size: 15px;">策略模式</a> <a href="/tags/jvm/" style="font-size: 15px;">jvm</a> <a href="/tags/日常/" style="font-size: 15px;">日常</a> <a href="/tags/生活/" style="font-size: 15px;">生活</a> <a href="/tags/JVM/" style="font-size: 15px;">JVM</a> <a href="/tags/SpringMVC/" style="font-size: 15px;">SpringMVC</a> <a href="/tags/注解/" style="font-size: 15px;">注解</a> <a href="/tags/gc/" style="font-size: 15px;">gc</a> <a href="/tags/socket/" style="font-size: 15px;">socket</a> <a href="/tags/I-O/" style="font-size: 15px;">I/O</a> <a href="/tags/观察者模式/" style="font-size: 15px;">观察者模式</a> <a href="/tags/Bean/" style="font-size: 15px;">Bean</a> <a href="/tags/Spring/" style="font-size: 15px;">Spring</a> <a href="/tags/Springboot/" style="font-size: 15px;">Springboot</a> <a href="/tags/SpringAware/" style="font-size: 15px;">SpringAware</a> <a href="/tags/多线程/" style="font-size: 15px;">多线程</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> Letzte</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2019/08/13/Integer思考/">Java关于Integer的思考</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/08/12/阿里巴巴309期百年技术/">阿里巴巴309期百年技术感想</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/31/浅析通信IO/">浅析通信IO</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/02/黑苹果安装日志/">黑苹果安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/07/Session和Cookie/">Session和Cookie</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/01/浅谈观察者模式/">浅谈观察者模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/25/浅谈策略模式/">浅谈策略模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/03/SpringMVC基础/">SpringMVC基础</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/30/Spring高级话题/">Spring高级话题</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/26/Spring常用配置/">Spring常用配置</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> Blogroll</i></div><ul></ul><a href="http://www.example1.com/" title="site-name1" target="_blank">site-name1</a><ul></ul><a href="http://www.example2.com/" title="site-name2" target="_blank">site-name2</a><ul></ul><a href="http://www.example3.com/" title="site-name3" target="_blank">site-name3</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2019 <a href="/." rel="nofollow">南寒.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
