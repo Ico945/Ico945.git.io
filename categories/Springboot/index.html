@@ -8,18 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#202020"/>
   <meta http-equiv="x-ua-compatible" content="ie=edge">
-  <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
-  <link rel="icon" sizes="any" mask href="/images/favicon.ico" /> 
   <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
-  
-
-  <!-- viewjs support -->
-  
-    <!-- for theme: default is false -->
-    <!-- for page: default is true -->
-    <link  href="css/viewer.min.css" rel="stylesheet" >
-    <script src="js/viewer.min.js" type="text/javascript" charset="utf-8"></script>
-  
   
   
     <meta name="keywords" content="" />
@@ -46,9 +35,9 @@
 
 <body>
   <div class="nav-container">
-    <nav id="menu" class="home-menu pure-menu pure-menu-horizontal">
+    <nav class="home-menu pure-menu pure-menu-horizontal">
   <a class="pure-menu-heading" href="/">
-    <img class="avatar" src="/images/logo.png">
+    <img class="avatar" src="http://yehengchao.cn/images/logo.png">
     <span class="title">南寒</span>
   </a>
 
@@ -59,15 +48,19 @@
           
       
           
-            <li class="pure-menu-item"><a href="/archives/" class="pure-menu-link">归档</a></li>
+            <li class="pure-menu-item"><a href="/archives" class="pure-menu-link">归档</a></li>
           
       
           
-            <li class="pure-menu-item"><a href="/tags/" class="pure-menu-link">标签</a></li>
+            <li class="pure-menu-item"><a href="/tags" class="pure-menu-link">标签</a></li>
           
       
           
-            <li class="pure-menu-item"><a href="/about/" class="pure-menu-link">关于</a></li>
+            <li class="pure-menu-item"><a href="/search" class="pure-menu-link">搜索</a></li>
+          
+      
+          
+            <li class="pure-menu-item"><a href="https://0xff000000.com" class="pure-menu-link">关于</a></li>
           
       
           
@@ -187,10 +180,9 @@
   </div>
   <footer class="footer text-center">
     <div id="bottom-inner">
-        <a class="bottom-item" href="https://jacobchang.cn/">首页</a> |
-        <a class="bottom-item" href="https://jacobchang.cn/" target="_blank">主站</a> |
-        <a class="bottom-item" href="https://zhangbo.site/" target="_blank">备份站点</a> |
-        <a class="bottom-item" href="https://github.com/coderbean" target="_blank">GitHub</a> |
+        <a class="bottom-item" href="https://blog.0xff000000.com">首页</a> |
+        <a class="bottom-item" href="https://0xff000000.com" target="_blank">主站</a> |
+        <a class="bottom-item" href="https://github.com/KevinOfNeu" target="_blank">GitHub</a> |
         <a class="bottom-item" href="https://hexo.io" target="_blank">Powered by hexo</a> |
         <a class="bottom-item" href="https://github.com/KevinOfNeu/hexo-theme-xoxo" target="_blank">Theme xoxo</a>
     </div>
@@ -251,14 +243,14 @@
     }
 
     /**
-     * 设置点击事件
+     * 给logo设置点击事件
      * 
      * - 回到顶部
      * - 出现爱心
      */
     function attachEvent() {
       var old = typeof window.onclick === "function" && window.onclick;
-      var logo = document.getElementById("menu");
+      var logo = document.getElementById("logo");
       if (logo) {
         logo.onclick = function(event) {
           returnTop();
@@ -326,6 +318,5 @@
 
 
 
-  
 </body>
 </html>
